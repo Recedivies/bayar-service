@@ -17,7 +17,11 @@ public class SecurityConfiguration {
 
     public static final String[] ENDPOINTS_WHITELIST = {
             "/",
-            "/health"
+            "/health",
+            "/api/v1/invoices/",
+            "/api/v1/invoices/health",
+            "/api/v1/invoices/id/{id}",
+            "/api/v1/invoices/create",
     };
 
     @Bean
