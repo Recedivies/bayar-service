@@ -1,10 +1,10 @@
-package id.ac.ui.cs.advprog.bayarservice.service;
+package id.ac.ui.cs.advprog.bayarservice.service.invoice;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
 import id.ac.ui.cs.advprog.bayarservice.exceptions.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
-import id.ac.ui.cs.advprog.bayarservice.repository.InvoicesRepository;
+import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class InvoiceServiceImpl implements InvoiceService {
-    private final InvoicesRepository invoicesRepository;
+    private final InvoiceRepository invoicesRepository;
 
     @Override
     public List<Invoice> findAll() {
@@ -34,23 +34,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public Invoice create(InvoiceRequest request) {
-        Invoice invoice = null;
-        if (request.getPaymentMethod().equals(PaymentMethod.BANK.name())) {
-            invoice = Invoice.builder()
-                    .paymentMethod(PaymentMethod.BANK)
-                    .adminFee(request.getAdminFee())
-                    .totalAmount(request.getTotalAmount())
-                    .discount(request.getDiscount())
-                    .build();
-        } else if (request.getPaymentMethod().equals(PaymentMethod.CASH.name())) {
-            invoice = Invoice.builder()
-                    .paymentMethod(PaymentMethod.CASH)
-                    .adminFee(request.getAdminFee())
-                    .totalAmount(request.getTotalAmount())
-                    .discount(request.getDiscount())
-                    .build();
-        }
-        return invoicesRepository.save(invoice);
+        Invoice invoice = new Invoice();
+        Invoice newInvoice = mappingRequestToObject(invoice, request);
+        return invoicesRepository.save(newInvoice);
     }
 
     @Override
@@ -90,4 +76,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     private boolean isInvoiceDoesNotExist(UUID sessionId) {
         return invoicesRepository.findById(sessionId).isEmpty();
     }
+
+    private Invoice mappingRequestToObject(Invoice invoice, InvoiceRequest request) {
+        invoice.setSessionId(request.getSessionId());
+        invoice.setDiscount(request.getDiscount());
+        invoice.setPaymentMethod(PaymentMethod.valueOf(request.getPaymentMethod()));
+        invoice.setTotalAmount(request.getTotalAmount());
+        invoice.setAdminFee(request.getAdminFee());
+        return invoice;
+    }
+
 }

@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1/bills")
 @RequiredArgsConstructor
 public class BillController {
     private final BillService billService;
 
-    @GetMapping("/bills/{bill_id}")
+    @GetMapping("/{bill_id}")
     public ResponseEntity<Bill> getBillById(@PathVariable Integer bill_id) {
         Bill bill = billService.findById(bill_id);
         return ResponseEntity.ok(bill);
