@@ -3,7 +3,7 @@ package id.ac.ui.cs.advprog.bayarservice.service;
 import java.util.List;
 import java.util.UUID;
 
-import id.ac.ui.cs.advprog.bayarservice.dto.InvoiceRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import org.springframework.stereotype.Service;
 
