@@ -18,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "invoices")
+@Table(name = "invoices", indexes = {@Index(name = "invoice_session_id_idx", columnList = "sessionId")})
 public class Invoice {
     @Id
     @GeneratedValue

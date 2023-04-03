@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "bills")
+@Table(name = "bills", indexes = {@Index(name = "bills_invoice_id_idx", columnList = "invoice_id")})
 public class Bill {
     @Id
     @GeneratedValue
