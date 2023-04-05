@@ -4,10 +4,7 @@ import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.service.bill.BillService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/bills")
@@ -19,5 +16,11 @@ public class BillController {
     public ResponseEntity<Bill> getBillById(@PathVariable Integer bill_id) {
         Bill bill = billService.findById(bill_id);
         return ResponseEntity.ok(bill);
+    }
+
+    @DeleteMapping("/bills/delete/{bill_id}")
+    public ResponseEntity<String> deleteBillById(@PathVariable Integer bill_id) {
+        billService.delete(bill_id);
+        return ResponseEntity.ok(String.format("Deleted Bill with id %d", bill_id));
     }
 }

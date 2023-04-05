@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 @Service
 public interface InvoiceService {
     List<Invoice> findAll();
-    Invoice findById(UUID sessionId);
+    Invoice findById(Integer invoiceId);
     Invoice create(InvoiceRequest request);
-    Invoice update(UUID sessionId, InvoiceRequest request);
-    void delete(UUID sessionId);
+    Invoice update(Integer invoiceId, InvoiceRequest request);
+    void delete(Integer invoiceId);
 }
