@@ -49,6 +49,21 @@ public class BillServiceImpl implements BillService {
         }
     }
 
+    @Override
+    public Bill update(Integer id, BillRequest request) {
+        if (isBillDoesNotExist(id)) {
+            throw new BillDoesNotExistException(id);
+        } else {
+            Bill bill = billRepository.findBillById(id).get();
+            bill.setName(request.getName());
+            bill.setPrice(request.getPrice());
+            bill.setQuantity(request.getQuantity());
+            bill.setSubTotal(request.getSubTotal());
+            bill.setInvoice(invoiceService.findById(request.getInvoiceId()));
+            return this.billRepository.save(bill);
+        }
+    }
+
     private boolean isBillDoesNotExist(Integer id) {
         return billRepository.findBillById(id).isEmpty();
     }
