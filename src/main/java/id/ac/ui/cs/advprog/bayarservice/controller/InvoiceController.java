@@ -1,43 +1,34 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
-import id.ac.ui.cs.advprog.bayarservice.dto.Bill.BillRequest;
 import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
-import id.ac.ui.cs.advprog.bayarservice.service.bill.BillService;
 import id.ac.ui.cs.advprog.bayarservice.service.invoice.InvoiceService;
+import id.ac.ui.cs.advprog.bayarservice.util.Response;
+import id.ac.ui.cs.advprog.bayarservice.util.ResponseHandler;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
-
-
 
 @RestController
-@RequestMapping("/api/v1/invoices")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
 
-    private final BillService billService;
-
-    @GetMapping("/id/{invoiceId}")
+    @GetMapping("/invoices/id/{invoiceId}")
     public ResponseEntity<Invoice> getInvoice(@PathVariable Integer invoiceId) {
         Invoice response = invoiceService.findById(invoiceId);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<Invoice> addInvoice(@RequestBody InvoiceRequest request) {
-        Invoice response = invoiceService.create(request);
-        return ResponseEntity.ok(response);
+    @PostMapping(path = "/invoices", consumes = "application/json")
+    public ResponseEntity<Object> addInvoice(@RequestBody @Valid InvoiceRequest request) {
+        Invoice invoice = invoiceService.create(request);
+        return ResponseHandler.generateResponse(new Response(
+                "Success created invoice", HttpStatus.CREATED, "SUCCESS", invoice)
+        );
     }
-
-    @PostMapping("/{invoiceId}")
-    public ResponseEntity<Bill> addBillToInvoice(@RequestBody BillRequest request) {
-        Bill response = billService.create(request);
-        return ResponseEntity.ok(response);
-    }
-
-
 }
