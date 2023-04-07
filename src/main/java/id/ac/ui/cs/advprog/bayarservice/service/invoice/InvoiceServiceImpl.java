@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +25,11 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Invoice findById(UUID sessionId) {
-        if (isInvoiceDoesNotExist(sessionId)) {
-            throw new InvoiceDoesNotExistException(sessionId);
+    public Invoice findById(Integer invoiceId) {
+        if (isInvoiceDoesNotExist(invoiceId)) {
+            throw new InvoiceDoesNotExistException(invoiceId);
         }
-        return invoicesRepository.findById(sessionId).orElse(null);
+        return invoicesRepository.findById(invoiceId).orElse(null);
     }
 
     @Override
@@ -42,14 +41,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Invoice update(UUID sessionId, InvoiceRequest request){
-        if (isInvoiceDoesNotExist(sessionId)) {
-            throw new InvoiceDoesNotExistException(sessionId);
+    public Invoice update(Integer invoiceId, InvoiceRequest request){
+        if (isInvoiceDoesNotExist(invoiceId)) {
+            throw new InvoiceDoesNotExistException(invoiceId);
         }
         Invoice invoice = null;
         if (request.getPaymentMethod().equals(PaymentMethod.BANK.name())) {
             invoice = Invoice.builder()
-                    .sessionId(sessionId)
                     .paymentMethod(PaymentMethod.BANK)
                     .adminFee(request.getAdminFee())
                     .totalAmount(request.getTotalAmount())
@@ -57,7 +55,6 @@ public class InvoiceServiceImpl implements InvoiceService {
                     .build();
         } else if (request.getPaymentMethod().equals(PaymentMethod.CASH.name())) {
             invoice = Invoice.builder()
-                    .sessionId(sessionId)
                     .paymentMethod(PaymentMethod.CASH)
                     .adminFee(request.getAdminFee())
                     .totalAmount(request.getTotalAmount())
@@ -68,15 +65,15 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public void delete(UUID sessionId) {
-        if (isInvoiceDoesNotExist(sessionId)) {
-            throw new InvoiceDoesNotExistException(sessionId);
+    public void delete(Integer invoiceId) {
+        if (isInvoiceDoesNotExist(invoiceId)) {
+            throw new InvoiceDoesNotExistException(invoiceId);
         }
-        invoicesRepository.deleteById(sessionId);
+        invoicesRepository.deleteById(invoiceId);
     }
 
-    private boolean isInvoiceDoesNotExist(UUID sessionId) {
-        return invoicesRepository.findById(sessionId).isEmpty();
+    private boolean isInvoiceDoesNotExist(Integer invoiceId) {
+        return invoicesRepository.findById(invoiceId).isEmpty();
     }
 
     private boolean isValidPaymentMethod(String paymentMethod) {

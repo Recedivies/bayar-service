@@ -11,22 +11,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
-@RequestMapping("/api/v1/invoices")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
 
-    @GetMapping("/id/{id}")
-    public ResponseEntity<Invoice> getInvoice(@PathVariable UUID id) {
-        Invoice response = invoiceService.findById(id);
+    @GetMapping("/invoices/id/{invoiceId}")
+    public ResponseEntity<Invoice> getInvoice(@PathVariable Integer invoiceId) {
+        Invoice response = invoiceService.findById(invoiceId);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(consumes = "application/json")
+    @PostMapping(path = "/invoices", consumes = "application/json")
     public ResponseEntity<Object> addInvoice(@RequestBody @Valid InvoiceRequest request) {
         Invoice invoice = invoiceService.create(request);
         return ResponseHandler.generateResponse(new Response(

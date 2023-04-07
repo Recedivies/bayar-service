@@ -3,7 +3,6 @@ package id.ac.ui.cs.advprog.bayarservice.controller;
 import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.service.bill.BillServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,11 +26,6 @@ class BillControllerTest {
 
     @MockBean
     private BillServiceImpl billService;
-
-    @BeforeEach
-    void setUp() {
-
-    }
 
     @Test
     void testGetBillByIdShouldReturn200OK() throws Exception {
