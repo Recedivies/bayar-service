@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface BillRepository extends JpaRepository<Bill, Integer> {
     @NonNull
-    Optional<Bill> findBillById(@NonNull Integer id);
+    Optional<Bill> findById(@NonNull Integer id);
 }
