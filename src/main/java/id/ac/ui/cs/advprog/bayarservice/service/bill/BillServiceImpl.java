@@ -1,6 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.service.bill;
 
-import id.ac.ui.cs.advprog.bayarservice.exceptions.BillDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.repository.BillRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill findById(Integer id) {
-        Optional<Bill> bill = billRepository.findBillById(id);
+        Optional<Bill> bill = billRepository.findById(id);
         if (bill.isEmpty()) {
             throw new BillDoesNotExistException(id);
         }

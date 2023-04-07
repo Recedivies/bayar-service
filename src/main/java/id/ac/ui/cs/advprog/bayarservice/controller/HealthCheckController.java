@@ -11,7 +11,6 @@ public class HealthCheckController {
 
     @GetMapping("/health")
     public @ResponseBody String healthCheck() {
-        return "OK1";
+        return "OK";
     }
-
 }
