@@ -13,5 +13,4 @@ public class HealthCheckController {
     public @ResponseBody String healthCheck() {
         return "OK";
     }
-
 }
