@@ -54,7 +54,7 @@ public class BillServiceImpl implements BillService {
         if (isBillDoesNotExist(id)) {
             throw new BillDoesNotExistException(id);
         } else {
-            Bill bill = billRepository.findBillById(id).get();
+            Bill bill = billRepository.findById(id).get();
             bill.setName(request.getName());
             bill.setPrice(request.getPrice());
             bill.setQuantity(request.getQuantity());
