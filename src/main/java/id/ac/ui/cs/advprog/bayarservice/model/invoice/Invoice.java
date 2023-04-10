@@ -3,6 +3,7 @@ package id.ac.ui.cs.advprog.bayarservice.model.invoice;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +22,7 @@ import java.util.UUID;
 @Table(name = "invoices", indexes = {@Index(name = "invoice_session_id_idx", columnList = "sessionId")})
 public class Invoice {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     @Column(nullable = false, columnDefinition = "VARCHAR(5)")
     @Enumerated(EnumType.STRING)
@@ -33,7 +34,7 @@ public class Invoice {
     private Integer totalAmount;
     @Column(nullable = false)
     private Integer adminFee;
-    @Column(nullable = false, columnDefinition = "int default 0")
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer discount;
     @JsonManagedReference
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)

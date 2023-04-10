@@ -1,7 +1,8 @@
 package id.ac.ui.cs.advprog.bayarservice.service.invoice;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
-import id.ac.ui.cs.advprog.bayarservice.exceptions.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.InvalidPaymentMethodException;
+import id.ac.ui.cs.advprog.bayarservice.exception.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,9 +34,10 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public Invoice create(InvoiceRequest request) {
-        Invoice invoice = new Invoice();
-        Invoice newInvoice = mappingRequestToObject(invoice, request);
-        return invoicesRepository.save(newInvoice);
+        if (!isValidPaymentMethod(request.getPaymentMethod())) {
+            throw new InvalidPaymentMethodException(request.getPaymentMethod());
+        }
+        return invoicesRepository.save(request.toEntity());
     }
 
     @Override
@@ -75,13 +76,12 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoicesRepository.findById(invoiceId).isEmpty();
     }
 
-    private Invoice mappingRequestToObject(Invoice invoice, InvoiceRequest request) {
-        invoice.setSessionId(request.getSessionId());
-        invoice.setDiscount(request.getDiscount());
-        invoice.setPaymentMethod(PaymentMethod.valueOf(request.getPaymentMethod()));
-        invoice.setTotalAmount(request.getTotalAmount());
-        invoice.setAdminFee(request.getAdminFee());
-        return invoice;
+    private boolean isValidPaymentMethod(String paymentMethod) {
+        for (PaymentMethod pm : PaymentMethod.values()) {
+            if (pm.name().equals(paymentMethod)) {
+                return true;
+            }
+        }
+        return false;
     }
-
 }

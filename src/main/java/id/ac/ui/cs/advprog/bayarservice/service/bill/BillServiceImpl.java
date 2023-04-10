@@ -1,7 +1,7 @@
 package id.ac.ui.cs.advprog.bayarservice.service.bill;
 
+import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.dto.Bill.BillRequest;
-import id.ac.ui.cs.advprog.bayarservice.exceptions.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.repository.BillRepository;
@@ -19,7 +19,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill findById(Integer id) {
-        Optional<Bill> bill = billRepository.findBillById(id);
+        Optional<Bill> bill = billRepository.findById(id);
         if (bill.isEmpty()) {
             throw new BillDoesNotExistException(id);
         }
@@ -43,8 +43,8 @@ public class BillServiceImpl implements BillService {
         if (isBillDoesNotExist(id)) {
             throw new BillDoesNotExistException(id);
         } else {
-            Invoice parent = invoiceService.findById(billRepository.findBillById(id).get().getInvoice().getId());
-            parent.getBills().remove(billRepository.findBillById(id).get());
+            Invoice parent = invoiceService.findById(billRepository.findById(id).get().getInvoice().getId());
+            parent.getBills().remove(billRepository.findById(id).get());
             billRepository.deleteById(id);
         }
     }
@@ -65,6 +65,6 @@ public class BillServiceImpl implements BillService {
     }
 
     private boolean isBillDoesNotExist(Integer id) {
-        return billRepository.findBillById(id).isEmpty();
+        return billRepository.findById(id).isEmpty();
     }
 }

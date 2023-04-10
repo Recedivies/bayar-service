@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "bills", indexes = {@Index(name = "bills_invoice_id_idx", columnList = "invoice_id")})
 public class Bill {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     @Column(nullable = false)
     private String name;
