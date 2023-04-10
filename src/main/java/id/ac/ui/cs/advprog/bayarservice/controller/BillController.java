@@ -35,4 +35,10 @@ public class BillController {
         billService.delete(bill_id);
         return ResponseEntity.ok(String.format("Deleted Bill with id %d", bill_id));
     }
+
+    @PutMapping("/bills/update/{bill_id}")
+    public ResponseEntity<Bill> updateBillById(@PathVariable Integer bill_id, @RequestBody BillRequest request) {
+        Bill updatedBill = billService.update(bill_id, request);
+        return ResponseEntity.ok(updatedBill);
+    }
 }
