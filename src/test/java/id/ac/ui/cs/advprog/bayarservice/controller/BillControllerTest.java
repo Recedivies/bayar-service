@@ -1,8 +1,12 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
+import id.ac.ui.cs.advprog.bayarservice.Util;
+import id.ac.ui.cs.advprog.bayarservice.dto.Bill.BillRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.service.bill.BillServiceImpl;
+import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -78,5 +83,64 @@ class BillControllerTest {
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(jsonPath("$.status").value("FAILED"))
                 .andDo(print());
+    }
+
+    @Test
+    void testDeleteBillByIdShouldReturn200OK () throws Exception {
+        int billId = 123;
+        String requestURI = END_POINT_PATH + "/delete/" + billId;
+
+        Bill bill = Bill.builder()
+                .id(billId)
+                .name("Coffee")
+                .quantity(5)
+                .price(10000)
+                .subTotal(50000L)
+                .build();
+
+        when(billService.findById(billId)).thenReturn(bill);
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("deleteBillById"))
+                .andDo(print());
+
+        verify(billService, atLeastOnce()).delete(billId);
+    }
+
+    @Test
+    void testDeleteBillByIdShouldReturn405MethodNotAllowed() throws Exception {
+        int billId = 123;
+        String requestURI = END_POINT_PATH + "/delete/" + billId;
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(put(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    void testDeleteBillByIdShouldReturn404NotFound() throws Exception {
+        int billId = 123;
+        String requestURI = END_POINT_PATH + "/delete/" + billId;
+
+        when(billService.findById(billId)).thenThrow(BillDoesNotExistException.class);
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isNotFound())
+                .andExpect(handler().methodName("deleteBillById"))
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        verify(billService, atMostOnce()).delete(billId);
     }
 }
