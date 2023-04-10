@@ -9,4 +9,5 @@ public interface BillService {
     Bill findById(Integer id);
     Bill create(BillRequest request);
     void delete(Integer id);
+    Bill update(Integer id, BillRequest request);
 }
