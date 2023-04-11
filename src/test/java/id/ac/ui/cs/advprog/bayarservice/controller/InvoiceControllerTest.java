@@ -34,6 +34,7 @@ class InvoiceControllerTest {
     @Test
     void testAddInvoiceShouldReturn201Created() throws Exception {
         Invoice invoice = Invoice.builder()
+                .id(1)
                 .paymentMethod(PaymentMethod.CASH)
                 .adminFee(5000)
                 .totalAmount(100000)
