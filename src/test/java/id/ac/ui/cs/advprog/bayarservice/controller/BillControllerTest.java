@@ -2,7 +2,6 @@ package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
 import id.ac.ui.cs.advprog.bayarservice.dto.Bill.BillRequest;
-import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
@@ -15,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 
 
 import java.util.UUID;
@@ -34,6 +34,9 @@ class BillControllerTest {
 
     @MockBean
     private BillServiceImpl billService;
+
+    @MockBean
+    private InvoiceRepository invoiceRepository;
 
     @Test
     void testGetBillByIdShouldReturn200OK() throws Exception {
@@ -152,39 +155,92 @@ class BillControllerTest {
         int billId = 123;
         String requestURI = "/api/v1/invoices/{invoiceId}/bills";
 
-        BillRequest billRequest = BillRequest.builder()
+        Bill bill = Bill.builder()
+                .id(billId)
                 .name("Coffee")
                 .quantity(5)
                 .price(10000)
                 .subTotal(50000L)
-                .invoiceId(1)
                 .build();
 
-        InvoiceRequest invoiceRequest = InvoiceRequest.builder()
+        when(billService.create(any(BillRequest.class))).thenReturn(bill);
+
+        String requestBody = Util.mapToJson(bill);
+
+        Invoice invoice = Invoice.builder()
                 .id(1)
-                .paymentMethod(String.valueOf(PaymentMethod.CASH))
-                .adminFee(2500)
-                .totalAmount(200000)
-                .discount(10000)
+                .paymentMethod(PaymentMethod.CASH)
+                .adminFee(5000)
+                .totalAmount(100000)
+                .discount(5000)
                 .sessionId(UUID.randomUUID())
                 .build();
+        invoiceRepository.save(invoice);
 
-        mockMvc.perform(post("/api/v1/invoices")
+        mockMvc.perform(post(requestURI, invoice.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(Util.mapToJson(invoiceRequest)))
+                        .content(requestBody))
                 .andExpect(status().isOk())
-                .andExpect(handler().methodName("addInvoice"))
-                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(handler().methodName("addBillToInvoice"))
+                .andExpect(jsonPath("$.id").value(bill.getId()))
+                .andExpect(jsonPath("$.name").value(bill.getName()))
+                .andExpect(jsonPath("$.quantity").value(bill.getQuantity()))
+                .andExpect(jsonPath("$.price").value(bill.getPrice()))
+                .andExpect(jsonPath("$.subTotal").value(bill.getSubTotal()))
                 .andDo(print());
 
-        mockMvc.perform(post(requestURI, billRequest.getInvoiceId())
+        verify(billService, atLeastOnce()).create(any(BillRequest.class));
+    }
+
+    @Test
+    void testAddBillShouldReturn400BadRequest() throws Exception {
+        Bill bill = Bill.builder().build();
+        String requestURI = "/api/v1/invoices/{invoiceId}/bills";
+        String requestBody = Util.mapToJson(bill);
+
+        mockMvc.perform(post(requestURI, 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(Util.mapToJson(billRequest)))
-                .andExpect(status().isOk())
-                .andExpect(handler().methodName("addBill"))
-                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                        .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    void testAddBillShouldReturn405MethodNotAllowed() throws Exception {
+        int billId = 123;
+        String requestURI = "/api/v1/invoices/{invoiceId}/bills";
+
+        Bill bill = Bill.builder()
+                .id(billId)
+                .name("Coffee")
+                .quantity(5)
+                .price(10000)
+                .subTotal(50000L)
+                .build();
+
+        when(billService.create(any(BillRequest.class))).thenReturn(bill);
+
+        String requestBody = Util.mapToJson(bill);
+
+        mockMvc.perform(get(requestURI, 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
                 .andDo(print());
 
-        verify(billService, atLeastOnce()).create(billRequest);
+        mockMvc.perform(put(requestURI, 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(delete(requestURI, 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
     }
 }
