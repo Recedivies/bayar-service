@@ -5,6 +5,7 @@ import id.ac.ui.cs.advprog.bayarservice.dto.Bill.BillRequest;
 import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
+import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import id.ac.ui.cs.advprog.bayarservice.service.bill.BillServiceImpl;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -142,5 +145,46 @@ class BillControllerTest {
                 .andDo(print());
 
         verify(billService, atMostOnce()).delete(billId);
+    }
+
+    @Test
+    void testAddBillShouldReturn200OK() throws Exception {
+        int billId = 123;
+        String requestURI = "/api/v1/invoices/{invoiceId}/bills";
+
+        BillRequest billRequest = BillRequest.builder()
+                .name("Coffee")
+                .quantity(5)
+                .price(10000)
+                .subTotal(50000L)
+                .invoiceId(1)
+                .build();
+
+        InvoiceRequest invoiceRequest = InvoiceRequest.builder()
+                .id(1)
+                .paymentMethod(String.valueOf(PaymentMethod.CASH))
+                .adminFee(2500)
+                .totalAmount(200000)
+                .discount(10000)
+                .sessionId(UUID.randomUUID())
+                .build();
+
+        mockMvc.perform(post("/api/v1/invoices")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(Util.mapToJson(invoiceRequest)))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("addInvoice"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI, billRequest.getInvoiceId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(Util.mapToJson(billRequest)))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("addBill"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+
+        verify(billService, atLeastOnce()).create(billRequest);
     }
 }

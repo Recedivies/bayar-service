@@ -14,6 +14,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
     @NonNull
     List<Invoice> findAll();
     @NonNull
-    Optional<Invoice> findById(@NonNull UUID sessionId);
-    void deleteById(@NonNull UUID sessionId);
+    Optional<Invoice> findById(@NonNull Integer id);
+    void deleteById(@NonNull Integer id);
 }

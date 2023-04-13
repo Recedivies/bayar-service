@@ -2,6 +2,8 @@ package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
 import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
+import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import id.ac.ui.cs.advprog.bayarservice.service.invoice.InvoiceServiceImpl;
@@ -34,6 +36,7 @@ class InvoiceControllerTest {
     @Test
     void testAddInvoiceShouldReturn201Created() throws Exception {
         Invoice invoice = Invoice.builder()
+                .id(1)
                 .paymentMethod(PaymentMethod.CASH)
                 .adminFee(5000)
                 .totalAmount(100000)
@@ -81,6 +84,60 @@ class InvoiceControllerTest {
         mockMvc.perform(get(END_POINT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+    }
+
+    @Test // Review
+    void testGetInvoiceByIdShouldReturn200OK() throws Exception {
+        int invoiceId = 123;
+        String requestURI = END_POINT_PATH + "/id/" + invoiceId;
+
+        Invoice invoice = Invoice.builder()
+                .id(invoiceId)
+                .paymentMethod(PaymentMethod.CASH)
+                .adminFee(5000)
+                .totalAmount(100000)
+                .discount(5000)
+                .sessionId(UUID.randomUUID())
+                .build();
+
+        when(invoiceService.findById(invoiceId)).thenReturn(invoice);
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("getInvoiceById"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.content.id").value(invoice.getId()))
+                .andDo(print());
+
+        verify(invoiceService, atLeastOnce()).findById(invoiceId);
+    }
+
+    @Test // Review
+    void testGetInvoiceByIdShouldReturn404NotFound() throws Exception {
+        int invoiceId = 123;
+        String requestURI = END_POINT_PATH + "/id/" + invoiceId;
+
+        when(invoiceService.findById(invoiceId)).thenThrow(BillDoesNotExistException.class);
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isNotFound())
+                .andExpect(handler().methodName("getInvoiceById"))
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        verify(invoiceService, atMostOnce()).findById(invoiceId);
+    }
+
+    @Test // Review
+    void testGetInvoiceByIdShouldReturn405MethodNotAllowed() throws Exception {
+        int invoiceId = 123;
+        String requestURI = END_POINT_PATH + "/id/" + invoiceId;
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(jsonPath("$.status").value("FAILED"))
                 .andDo(print());

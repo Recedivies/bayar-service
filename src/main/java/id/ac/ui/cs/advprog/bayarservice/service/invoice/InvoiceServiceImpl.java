@@ -48,6 +48,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice invoice = null;
         if (request.getPaymentMethod().equals(PaymentMethod.BANK.name())) {
             invoice = Invoice.builder()
+                    .id(invoiceId)
                     .paymentMethod(PaymentMethod.BANK)
                     .adminFee(request.getAdminFee())
                     .totalAmount(request.getTotalAmount())
@@ -55,6 +56,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                     .build();
         } else if (request.getPaymentMethod().equals(PaymentMethod.CASH.name())) {
             invoice = Invoice.builder()
+                    .id(invoiceId)
                     .paymentMethod(PaymentMethod.CASH)
                     .adminFee(request.getAdminFee())
                     .totalAmount(request.getTotalAmount())
