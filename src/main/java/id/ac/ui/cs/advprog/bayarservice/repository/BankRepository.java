@@ -16,5 +16,8 @@ public interface BankRepository extends JpaRepository<Bank, Integer>{
     @NonNull
     List<Bank> findAll();
 
+    @NonNull
+    Optional<Bank> findByName(@NonNull String name);
+
     void deleteById(@NonNull Integer id);
 }

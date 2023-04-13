@@ -32,16 +32,20 @@ public class BankRepositoryTest {
     }
 
     @Test
-    void testFindById() {
+    void testFindByIdOrFindByName() {
         Optional<Bank> optionalBank = bankRepository.findById(1);
+        Optional<Bank> optionalBank2 = bankRepository.findByName("Bank BCA");
 
         Assertions.assertTrue(optionalBank.isPresent());
+        Assertions.assertTrue(optionalBank2.isPresent());
     }
 
     @Test
-    void testFindByIdNotFound() {
+    void testFindByIdOrFindByNameNotFound() {
         Optional<Bank> optionalBank = bankRepository.findById(100);
+        Optional<Bank> optionalBank2 = bankRepository.findByName("Bank BRI");
 
         Assertions.assertFalse(optionalBank.isPresent());
+        Assertions.assertFalse(optionalBank2.isPresent());
     }
 }

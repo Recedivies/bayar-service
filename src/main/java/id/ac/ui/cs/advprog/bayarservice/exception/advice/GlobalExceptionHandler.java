@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.exception.advice;
 
+import id.ac.ui.cs.advprog.bayarservice.exception.BankAlreadyExistsException;
 import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.InvalidPaymentMethodException;
@@ -65,6 +66,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> generalError(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
                 exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "FAILED", null)
+        );
+    }
+
+    @ExceptionHandler(value = {BankAlreadyExistsException.class})
+    public ResponseEntity<Object> bankAlreadyExists(Exception exception) {
+        return ResponseHandler.generateResponse(new Response(
+                exception.getMessage(), HttpStatus.CONFLICT, "FAILED", null)
         );
     }
 }

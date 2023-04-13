@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.bayarservice.service;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.Bank.BankRequest;
+import id.ac.ui.cs.advprog.bayarservice.exception.BankAlreadyExistsException;
 import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.repository.BankRepository;
@@ -38,5 +39,18 @@ public class BankServiceTest {
         when(bankRepository.save(any(Bank.class))).thenReturn(bank);
         Bank result = bankService.create(request);
         Assertions.assertEquals(bank, result);
+    }
+
+    @Test
+    void whenCreateBankAlreadyExistShouldThrowBankAlreadyExistException() {
+        BankRequest request = BankRequest.builder()
+                .name("Bank BCA")
+                .build();
+
+        bank = Bank.builder()
+                .name(request.getName())
+                .build();
+        when(bankRepository.findByName(any(String.class))).thenReturn(Optional.of(bank));
+        Assertions.assertThrows(BankAlreadyExistsException.class, () -> bankService.create(request));
     }
 }

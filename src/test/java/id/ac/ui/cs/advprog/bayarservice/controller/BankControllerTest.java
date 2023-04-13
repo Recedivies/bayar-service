@@ -2,6 +2,7 @@ package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
 import id.ac.ui.cs.advprog.bayarservice.dto.Bank.BankRequest;
+import id.ac.ui.cs.advprog.bayarservice.exception.BankAlreadyExistsException;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.service.bank.BankServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -98,6 +99,39 @@ public class BankControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(status().isMethodNotAllowed())
+                .andDo(print());
+    }
+
+    @Test
+    void testCreateBankShouldReturn409Conflict () throws Exception {
+        String requestURI = END_POINT_PATH + "addBank";
+
+        Bank bank = Bank.builder()
+                .id(1)
+                .name("BCA")
+                .adminFee(6500)
+                .build();
+
+        String requestBody = Util.mapToJson(bank);
+
+        when(bankService.create(any(BankRequest.class))).thenReturn(bank);
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("BCA"))
+                .andExpect(jsonPath("$.adminFee").value(6500))
+                .andExpect(handler().methodName("addBank"))
+                .andDo(print());
+        verify(bankService, times(1)).create(any(BankRequest.class));
+
+        when(bankService.create(any(BankRequest.class))).thenThrow(new BankAlreadyExistsException(bank.getName()));
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isConflict())
+                .andExpect(handler().methodName("addBank"))
                 .andDo(print());
     }
 }
