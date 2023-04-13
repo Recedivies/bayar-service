@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.exception.advice;
 
+import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.InvalidPaymentMethodException;
 import id.ac.ui.cs.advprog.bayarservice.util.Response;
@@ -20,7 +21,10 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = {BillDoesNotExistException.class})
+    @ExceptionHandler(value = {
+            BillDoesNotExistException.class,
+            BankDoesNotExistException.class
+    })
     public ResponseEntity<Object> billNotAvailableHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
                 exception.getMessage(), HttpStatus.NOT_FOUND, "FAILED", null)
