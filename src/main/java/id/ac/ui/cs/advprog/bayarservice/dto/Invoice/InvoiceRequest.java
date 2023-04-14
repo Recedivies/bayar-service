@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.dto.Invoice;
 
+import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import jakarta.validation.constraints.*;
@@ -16,8 +17,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class InvoiceRequest {
 
-    @NotNull(message = "Id is mandatory")
-    private Integer id;
 
     @NotNull(message = "sessionId is mandatory")
     private UUID sessionId;
@@ -40,7 +39,6 @@ public class InvoiceRequest {
     public Invoice toEntity() {
         Invoice entity = new Invoice();
 
-        entity.setId(this.id);
         entity.setSessionId(this.sessionId);
         entity.setDiscount(this.discount);
         entity.setPaymentMethod(PaymentMethod.valueOf(this.paymentMethod));
