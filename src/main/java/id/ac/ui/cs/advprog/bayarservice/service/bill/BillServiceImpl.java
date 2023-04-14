@@ -43,8 +43,6 @@ public class BillServiceImpl implements BillService {
         if (isBillDoesNotExist(id)) {
             throw new BillDoesNotExistException(id);
         } else {
-            Invoice parent = invoiceService.findById(billRepository.findById(id).get().getInvoice().getId());
-            parent.getBills().remove(billRepository.findById(id).get());
             billRepository.deleteById(id);
         }
     }

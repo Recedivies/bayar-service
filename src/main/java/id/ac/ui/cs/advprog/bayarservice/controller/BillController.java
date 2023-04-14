@@ -24,14 +24,20 @@ public class BillController {
         );
     }
 
-    @PostMapping("invoices/{invoiceId}/bills")
+    @PostMapping("/invoices/{invoiceId}/bills")
     public ResponseEntity<Bill> addBillToInvoice(@PathVariable Integer invoiceId, @RequestBody BillRequest request) {
         Bill response = billService.create(request);
+        if (response == null) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/bills/delete/{bill_id}")
     public ResponseEntity<String> deleteBillById(@PathVariable Integer bill_id) {
+        if (billService.findById(bill_id) == null) {
+            return ResponseEntity.notFound().build();
+        }
         billService.delete(bill_id);
         return ResponseEntity.ok(String.format("Deleted Bill with id %d", bill_id));
     }
