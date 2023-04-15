@@ -45,6 +45,9 @@ public class BillController {
     @PutMapping("/bills/update/{bill_id}")
     public ResponseEntity<Bill> updateBillById(@PathVariable Integer bill_id, @RequestBody BillRequest request) {
         Bill updatedBill = billService.update(bill_id, request);
+        if (billService.findById(bill_id) == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(updatedBill);
     }
 }

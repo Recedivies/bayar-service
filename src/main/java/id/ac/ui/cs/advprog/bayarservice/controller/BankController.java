@@ -21,4 +21,13 @@ public class BankController {
         }
         return ResponseEntity.ok(bank);
     }
+
+    @DeleteMapping("/banks/delete/{bank_id}")
+    public ResponseEntity<String> deleteBankById(@PathVariable Integer bank_id) {
+        if (bankService.findById(bank_id) == null) {
+            return ResponseEntity.notFound().build();
+        }
+        bankService.deleteById(bank_id);
+        return ResponseEntity.ok(String.format("Deleted Bank with id %d", bank_id));
+    }
 }
