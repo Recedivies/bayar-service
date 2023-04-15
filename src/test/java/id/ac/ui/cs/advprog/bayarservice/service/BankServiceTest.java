@@ -3,6 +3,7 @@ package id.ac.ui.cs.advprog.bayarservice.service;
 import id.ac.ui.cs.advprog.bayarservice.dto.Bank.BankRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.BankAlreadyExistsException;
 import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.repository.BankRepository;
 import id.ac.ui.cs.advprog.bayarservice.service.bank.BankServiceImpl;
@@ -52,5 +53,27 @@ public class BankServiceTest {
                 .build();
         when(bankRepository.findByName(any(String.class))).thenReturn(Optional.of(bank));
         Assertions.assertThrows(BankAlreadyExistsException.class, () -> bankService.create(request));
+    }
+
+    @Test
+    void whenDeleteAndFoundByIdShouldDeleteBank() {
+        bank = Bank.builder()
+                .name("BCA")
+                .adminFee(3000)
+                .build();
+        bankRepository.save(bank);
+        when(bankRepository.findById(any(Integer.class))).thenReturn(Optional.of(bank));
+
+        bankService.deleteById(1);
+
+        verify(bankRepository, atLeastOnce()).findById(any(Integer.class));
+        verify(bankRepository, atLeastOnce()).deleteById(any(Integer.class));
+    }
+
+    @Test
+    void whenDeleteAndNotFoundByIdShouldThrowException() {
+        when(bankRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(BankDoesNotExistException.class, () -> bankService.deleteById(1));
     }
 }

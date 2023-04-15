@@ -31,8 +31,6 @@ public class InvoiceServiceTest {
     @Mock
     private InvoiceRepository invoiceRepository;
 
-    private final java.util.Date utilDate = new java.util.Date();
-
     UUID uuid = UUID.randomUUID();
     Invoice invoice;
     Invoice newInvoice;
@@ -60,7 +58,6 @@ public class InvoiceServiceTest {
         invoice = Invoice.builder()
                 .id(1)
                 .paymentMethod(PaymentMethod.CASH)
-                .createdAt(new Date(utilDate.getTime()))
                 .totalAmount(100000)
                 .adminFee(5000)
                 .discount(5000)
@@ -69,7 +66,6 @@ public class InvoiceServiceTest {
         newInvoice = Invoice.builder()
                 .id(1)
                 .paymentMethod(PaymentMethod.CASH)
-                .createdAt(new Date(utilDate.getTime()))
                 .totalAmount(210000)
                 .adminFee(20000)
                 .discount(10000)
@@ -99,32 +95,32 @@ public class InvoiceServiceTest {
         });
 
         Invoice result = invoiceService.create(createRequest);
-        result.setCreatedAt(new Date(utilDate.getTime()));
+
         verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
         Assertions.assertEquals(invoice, result);
     }
 
-    @Test // Review
+    @Test
     void whenUpdateInvoiceShouldReturnTheUpdatedInvoice() {
         when(invoiceRepository.findById(any(Integer.class))).thenReturn(Optional.of(invoice));
         when(invoiceRepository.save(any(Invoice.class))).thenAnswer(invocation ->
                     invocation.getArgument(0, Invoice.class));
 
         Invoice result = invoiceService.update(1, updateRequest);
-        result.setCreatedAt(new Date(utilDate.getTime()));
+
         verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
         Assertions.assertEquals(newInvoice, result);
 
     }
 
-    @Test // Review
+    @Test
     void whenUpdateInvoiceAndNotFoundShouldThrowException() {
         when(invoiceRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
         Assertions.assertThrows(InvoiceDoesNotExistException.class, () -> invoiceService.findById(1));
 
     }
 
-    @Test // Review
+    @Test
     void whenFindByIdAndFoundShouldReturnInvoice() {
         when(invoiceRepository.findById(any(Integer.class))).thenReturn(Optional.of(invoice));
 
@@ -134,14 +130,14 @@ public class InvoiceServiceTest {
         Assertions.assertEquals(invoice, result);
     }
 
-    @Test // Review
+    @Test
     void whenFindByIdAndNotFoundShouldThrowException() {
         when(invoiceRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
 
         Assertions.assertThrows(InvoiceDoesNotExistException.class, () -> invoiceService.findById(1));
     }
 
-    @Test // Review
+    @Test
     void whenDeleteAndFoundByIdShouldDeleteInvoice() {
         when(invoiceRepository.findById(any(Integer.class))).thenReturn(Optional.of(invoice));
 
@@ -151,7 +147,7 @@ public class InvoiceServiceTest {
         verify(invoiceRepository, atLeastOnce()).deleteById(any(Integer.class));
     }
 
-    @Test // Review
+    @Test
     void whenDeleteAndNotFoundByIdShouldThrowException() {
         when(invoiceRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
 

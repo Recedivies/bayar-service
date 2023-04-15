@@ -7,4 +7,6 @@ import id.ac.ui.cs.advprog.bayarservice.dto.Bank.BankRequest;
 @Service
 public interface BankService {
     Bank create(BankRequest request);
+    Bank findById(Integer id);
+    void deleteById(Integer id);
 }

@@ -9,7 +9,6 @@ import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,69 +34,26 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoice.get();
     }
 
-//    @Override
-//    public Invoice findById(Integer invoiceId) {
-//        if (isInvoiceDoesNotExist(invoiceId)) {
-//            throw new InvoiceDoesNotExistException(invoiceId);
-//        }
-//        return invoicesRepository.findById(invoiceId).orElse(null);
-//    }
-
     @Override
     public Invoice create(InvoiceRequest request) {
-        Invoice invoice = null;
-        if (request.getPaymentMethod().equals(PaymentMethod.CASH.name())) {
-            invoice = Invoice.builder()
-                    .paymentMethod(PaymentMethod.CASH)
-                    .createdAt(new Date(utilDate.getTime()))
-                    .totalAmount(request.getTotalAmount())
-                    .adminFee(request.getAdminFee())
-                    .discount(request.getDiscount())
-                    .build();
+        if (!isValidPaymentMethod(request.getPaymentMethod())) {
+            throw new InvalidPaymentMethodException(request.getPaymentMethod());
         }
-        else if (request.getPaymentMethod().equals(PaymentMethod.BANK.name())) {
-            invoice = Invoice.builder()
-                    .paymentMethod(PaymentMethod.BANK)
-                    .createdAt(new Date(utilDate.getTime()))
-                    .totalAmount(request.getTotalAmount())
-                    .adminFee(request.getAdminFee())
-                    .discount(request.getDiscount())
-                    .build();
-        }
-        return invoiceRepository.save(invoice);
+        return invoiceRepository.save(request.toEntity());
     }
-
-//    @Override
-//    public Invoice create(InvoiceRequest request) {
-//        if (!isValidPaymentMethod(request.getPaymentMethod())) {
-//            throw new InvalidPaymentMethodException(request.getPaymentMethod());
-//        }
-//        return invoicesRepository.save(request.toEntity());
-//    }
 
     @Override
     public Invoice update(Integer invoiceId, InvoiceRequest request){
         if (isInvoiceDoesNotExist(invoiceId)) {
             throw new InvoiceDoesNotExistException(invoiceId);
         }
-        Invoice invoice = null;
-        if (request.getPaymentMethod().equals(PaymentMethod.BANK.name())) {
-            invoice = Invoice.builder()
-                    .id(invoiceId)
-                    .paymentMethod(PaymentMethod.BANK)
-                    .adminFee(request.getAdminFee())
-                    .totalAmount(request.getTotalAmount())
-                    .discount(request.getDiscount())
-                    .build();
-        } else if (request.getPaymentMethod().equals(PaymentMethod.CASH.name())) {
-            invoice = Invoice.builder()
-                    .id(invoiceId)
-                    .paymentMethod(PaymentMethod.CASH)
-                    .adminFee(request.getAdminFee())
-                    .totalAmount(request.getTotalAmount())
-                    .discount(request.getDiscount())
-                    .build();
-        }
+        Invoice invoice = this.invoiceRepository.findById(invoiceId).orElseThrow();
+        invoice.setAdminFee(request.getAdminFee());
+        invoice.setSessionId(request.getSessionId());
+        invoice.setPaymentMethod(PaymentMethod.valueOf(request.getPaymentMethod()));
+        invoice.setAdminFee(request.getAdminFee());
+        invoice.setTotalAmount(request.getTotalAmount());
+        invoice.setDiscount(request.getDiscount());
         return this.invoiceRepository.save(invoice);
     }
 
