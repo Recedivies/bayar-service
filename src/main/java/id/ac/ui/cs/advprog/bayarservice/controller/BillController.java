@@ -27,6 +27,9 @@ public class BillController {
     @PostMapping("/invoices/{invoiceId}/bills")
     public ResponseEntity<Bill> addBillToInvoice(@PathVariable Integer invoiceId, @RequestBody BillRequest request) {
         Bill response = billService.create(request);
+        if (response == null) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(response);
     }
 
@@ -45,6 +48,9 @@ public class BillController {
             return ResponseEntity.notFound().build();
         }
         Bill updatedBill = billService.update(bill_id, request);
+        if (billService.findById(bill_id) == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(updatedBill);
     }
 }

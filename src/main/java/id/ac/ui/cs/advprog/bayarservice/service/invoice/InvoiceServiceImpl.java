@@ -10,26 +10,28 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class InvoiceServiceImpl implements InvoiceService {
-    private final InvoiceRepository invoicesRepository;
-
+    private final InvoiceRepository invoiceRepository;
+    private final java.util.Date utilDate = new java.util.Date();
     @Override
     public List<Invoice> findAll() {
-        return invoicesRepository.findAll()
+        return invoiceRepository.findAll()
                 .stream()
                 .map(invoices -> invoices)
                 .toList();
     }
 
     @Override
-    public Invoice findById(Integer invoiceId) {
-        if (isInvoiceDoesNotExist(invoiceId)) {
-            throw new InvoiceDoesNotExistException(invoiceId);
+    public Invoice findById(Integer id) {
+        Optional<Invoice> invoice = invoiceRepository.findById(id);
+        if (invoice.isEmpty()) {
+            throw new InvoiceDoesNotExistException(id);
         }
-        return invoicesRepository.findById(invoiceId).orElse(null);
+        return invoice.get();
     }
 
     @Override
@@ -37,7 +39,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (!isValidPaymentMethod(request.getPaymentMethod())) {
             throw new InvalidPaymentMethodException(request.getPaymentMethod());
         }
-        return invoicesRepository.save(request.toEntity());
+        return invoiceRepository.save(request.toEntity());
     }
 
     @Override
@@ -45,23 +47,14 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (isInvoiceDoesNotExist(invoiceId)) {
             throw new InvoiceDoesNotExistException(invoiceId);
         }
-        Invoice invoice = null;
-        if (request.getPaymentMethod().equals(PaymentMethod.BANK.name())) {
-            invoice = Invoice.builder()
-                    .paymentMethod(PaymentMethod.BANK)
-                    .adminFee(request.getAdminFee())
-                    .totalAmount(request.getTotalAmount())
-                    .discount(request.getDiscount())
-                    .build();
-        } else if (request.getPaymentMethod().equals(PaymentMethod.CASH.name())) {
-            invoice = Invoice.builder()
-                    .paymentMethod(PaymentMethod.CASH)
-                    .adminFee(request.getAdminFee())
-                    .totalAmount(request.getTotalAmount())
-                    .discount(request.getDiscount())
-                    .build();
-        }
-        return this.invoicesRepository.save(invoice);
+        Invoice invoice = this.invoiceRepository.findById(invoiceId).orElseThrow();
+        invoice.setAdminFee(request.getAdminFee());
+        invoice.setSessionId(request.getSessionId());
+        invoice.setPaymentMethod(PaymentMethod.valueOf(request.getPaymentMethod()));
+        invoice.setAdminFee(request.getAdminFee());
+        invoice.setTotalAmount(request.getTotalAmount());
+        invoice.setDiscount(request.getDiscount());
+        return this.invoiceRepository.save(invoice);
     }
 
     @Override
@@ -69,11 +62,11 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (isInvoiceDoesNotExist(invoiceId)) {
             throw new InvoiceDoesNotExistException(invoiceId);
         }
-        invoicesRepository.deleteById(invoiceId);
+        invoiceRepository.deleteById(invoiceId);
     }
 
     private boolean isInvoiceDoesNotExist(Integer invoiceId) {
-        return invoicesRepository.findById(invoiceId).isEmpty();
+        return invoiceRepository.findById(invoiceId).isEmpty();
     }
 
     private boolean isValidPaymentMethod(String paymentMethod) {
