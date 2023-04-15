@@ -7,6 +7,7 @@ import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import id.ac.ui.cs.advprog.bayarservice.service.bill.BillServiceImpl;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
+import id.ac.ui.cs.advprog.bayarservice.service.invoice.InvoiceServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
