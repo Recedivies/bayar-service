@@ -51,16 +51,13 @@ public class BankServiceImpl implements BankService {
         }
         else {
             if (bankRepository.findById(id).isPresent()) {
-                if (isBankAlreadyExist(request.getName())) {
-                    throw new BankAlreadyExistsException(request.getName());
-                } else if (request.getName().equals(bankRepository.findById(id).get().getName())) {
-                    Bank bank = bankRepository.findById(id).get();
-                    bank.setName(request.getName());
-                    bank.setAdminFee(request.getAdminFee());
-                    return bankRepository.save(bank);
-                } else {
+                if (isBankAlreadyExist(request.getName()) && !id.equals(bankRepository.findByName(request.getName()).get().getId())) {
                     throw new BankAlreadyExistsException(request.getName());
                 }
+                Bank bank = bankRepository.findById(id).get();
+                bank.setName(request.getName());
+                bank.setAdminFee(request.getAdminFee());
+                return bankRepository.save(bank);
             }
             else {
                 throw new BankDoesNotExistException(id);
