@@ -30,4 +30,13 @@ public class BankController {
         bankService.deleteById(bank_id);
         return ResponseEntity.ok(String.format("Deleted Bank with id %d", bank_id));
     }
+
+    @PutMapping("banks/update/{bank_id}")
+    public ResponseEntity<Bank> updateBankById(@PathVariable Integer bank_id, @RequestBody BankRequest request) {
+        Bank bank = bankService.update(bank_id, request);
+        if (bank == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(bank);
+    }
 }
