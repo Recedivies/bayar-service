@@ -9,4 +9,5 @@ public interface BankService {
     Bank create(BankRequest request);
     Bank findById(Integer id);
     void deleteById(Integer id);
+    Bank update(Integer id, BankRequest request);
 }

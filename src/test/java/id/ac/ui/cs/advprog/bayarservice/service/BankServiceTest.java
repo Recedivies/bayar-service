@@ -76,4 +76,44 @@ public class BankServiceTest {
 
         Assertions.assertThrows(BankDoesNotExistException.class, () -> bankService.deleteById(1));
     }
+
+    @Test
+    void whenUpdateAndFoundByIdShouldUpdateBank() {
+        BankRequest request = BankRequest.builder()
+                .name("Bank BCA")
+                .build();
+
+        bank = Bank.builder()
+                .name(request.getName())
+                .build();
+        when(bankRepository.findById(any(Integer.class))).thenReturn(Optional.of(bank));
+        when(bankRepository.save(any(Bank.class))).thenReturn(bank);
+        Bank result = bankService.update(1, request);
+        Assertions.assertEquals(bank, result);
+    }
+
+    @Test
+    void whenUpdateAndNotFoundByIdShouldThrowException() {
+        BankRequest request = BankRequest.builder()
+                .name("Bank BCA")
+                .build();
+
+        when(bankRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
+        Assertions.assertThrows(BankDoesNotExistException.class, () -> bankService.update(1, request));
+    }
+
+    @Test
+    void whenUpdateAndFoundByIdButNameAlreadyExistShouldThrowException() {
+        BankRequest request = BankRequest.builder()
+                .name("Bank BCA")
+                .build();
+
+        bank = Bank.builder()
+                .name(request.getName())
+                .build();
+        when(bankRepository.findById(any(Integer.class))).thenReturn(Optional.of(bank));
+        when(bankRepository.findByName(any(String.class))).thenReturn(Optional.of(bank));
+        Assertions.assertThrows(BankAlreadyExistsException.class, () -> bankService.update(1, request));
+    }
+
 }
