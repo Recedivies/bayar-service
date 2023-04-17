@@ -88,7 +88,7 @@ class InvoiceControllerTest {
                 .andDo(print());
     }
 
-    @Test // Review
+    @Test
     void testGetInvoiceByIdShouldReturn200OK() throws Exception {
         int invoiceId = 123;
         String requestURI = END_POINT_PATH + "/id/" + invoiceId;
@@ -114,7 +114,7 @@ class InvoiceControllerTest {
         verify(invoiceService, atLeastOnce()).findById(invoiceId);
     }
 
-    @Test // Review
+    @Test
     void testGetInvoiceByIdShouldReturn404NotFound() throws Exception {
         int invoiceId = 123;
         String requestURI = END_POINT_PATH + "/id/" + invoiceId;
@@ -130,7 +130,7 @@ class InvoiceControllerTest {
         verify(invoiceService, atMostOnce()).findById(invoiceId);
     }
 
-    @Test // Review
+    @Test
     void testGetInvoiceByIdShouldReturn405MethodNotAllowed() throws Exception {
         int invoiceId = 123;
         String requestURI = END_POINT_PATH + "/id/" + invoiceId;

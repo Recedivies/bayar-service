@@ -13,6 +13,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -28,6 +31,30 @@ public class BankControllerTest {
 
     @MockBean
     private BankServiceImpl bankService;
+
+    @Test
+    void testGetBankShouldReturn200OK() throws Exception {
+        String requestURI = END_POINT_PATH + "banks";
+
+        Bank bank = Bank.builder()
+                .id(1)
+                .name("BNI")
+                .adminFee(5000)
+                .build();
+
+        List<Bank> bankList = List.of(bank);
+
+        when(bankService.getAll()).thenReturn(bankList);
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("getAllBanks"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.content[0].id").value(bank.getId()))
+                .andDo(print());
+
+        verify(bankService, atLeastOnce()).getAll();
+    }
 
     @Test
     void testCreateBankShouldReturn200OK() throws Exception {
