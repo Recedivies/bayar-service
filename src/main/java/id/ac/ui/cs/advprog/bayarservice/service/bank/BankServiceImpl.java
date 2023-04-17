@@ -3,18 +3,23 @@ package id.ac.ui.cs.advprog.bayarservice.service.bank;
 import id.ac.ui.cs.advprog.bayarservice.exception.BankAlreadyExistsException;
 import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.dto.Bank.BankRequest;
-import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
-import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.repository.BankRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class BankServiceImpl implements BankService {
     private final BankRepository bankRepository;
+
+    @Override
+    public List<Bank> getAll() {
+        return this.bankRepository.findAll();
+    }
 
     @Override
     public Bank create(BankRequest request) {
@@ -40,7 +45,9 @@ public class BankServiceImpl implements BankService {
     @Override
     public Bank findById(Integer id) {
         Optional<Bank> bank = bankRepository.findById(id);
-        // TODO
+        if (bank.isEmpty()) {
+            throw new BankDoesNotExistException(id);
+        }
         return bank.get();
     }
 

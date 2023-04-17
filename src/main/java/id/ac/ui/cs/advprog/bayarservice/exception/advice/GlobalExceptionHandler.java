@@ -1,9 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.exception.advice;
 
-import id.ac.ui.cs.advprog.bayarservice.exception.BankAlreadyExistsException;
-import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
-import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
-import id.ac.ui.cs.advprog.bayarservice.exception.InvalidPaymentMethodException;
+import id.ac.ui.cs.advprog.bayarservice.exception.*;
 import id.ac.ui.cs.advprog.bayarservice.util.Response;
 import id.ac.ui.cs.advprog.bayarservice.util.ResponseHandler;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -24,9 +21,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = {
             BillDoesNotExistException.class,
-            BankDoesNotExistException.class
+            BankDoesNotExistException.class,
+            InvoiceDoesNotExistException.class
     })
-    public ResponseEntity<Object> billNotAvailableHandler(Exception exception) {
+    public ResponseEntity<Object> notAvailableHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
                 exception.getMessage(), HttpStatus.NOT_FOUND, "FAILED", null)
         );

@@ -3,6 +3,7 @@ package id.ac.ui.cs.advprog.bayarservice.repository;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
+import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,11 +26,13 @@ public class BillRepositoryTest {
     private InvoiceRepository invoiceRepository;
 
     UUID uuid = UUID.randomUUID();
+    Bill bill;
 
     @BeforeEach
     void setUp() {
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
+                .paymentStatus(PaymentStatus.UNPAID)
                 .adminFee(5000)
                 .totalAmount(100000)
                 .discount(5000)
@@ -37,7 +40,7 @@ public class BillRepositoryTest {
                 .build();
         invoiceRepository.save(invoice);
 
-        Bill bill = Bill.builder()
+        bill = Bill.builder()
                 .id(1)
                 .name("Coffee")
                 .quantity(5)
@@ -55,7 +58,7 @@ public class BillRepositoryTest {
 
     @Test
     void testFindById() {
-        Optional<Bill> optionalBill = billRepository.findById(1);
+        Optional<Bill> optionalBill = billRepository.findById(bill.getId());
 
         Assertions.assertTrue(optionalBill.isPresent());
     }
