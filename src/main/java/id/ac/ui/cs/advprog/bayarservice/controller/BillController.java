@@ -24,8 +24,8 @@ public class BillController {
         );
     }
 
-    @PostMapping("/invoices/{invoiceId}/bills")
-    public ResponseEntity<Bill> addBillToInvoice(@PathVariable Integer invoiceId, @RequestBody BillRequest request) {
+    @PostMapping("/bills")
+    public ResponseEntity<Bill> addBillToInvoice(@RequestBody BillRequest request) {
         Bill response = billService.create(request);
         if (response == null) {
             return ResponseEntity.badRequest().build();

@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import id.ac.ui.cs.advprog.bayarservice.service.invoice.InvoiceService;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class BillServiceImpl implements BillService {
@@ -18,11 +16,8 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill findById(Integer id) {
-        Optional<Bill> bill = billRepository.findById(id);
-        if (bill.isEmpty()) {
-            throw new BillDoesNotExistException(id);
-        }
-        return bill.get();
+        return this.billRepository.findById(id)
+                .orElseThrow(() -> new BillDoesNotExistException(id));
     }
 
     @Override
@@ -51,7 +46,7 @@ public class BillServiceImpl implements BillService {
         if (isBillDoesNotExist(id)) {
             throw new BillDoesNotExistException(id);
         } else {
-            Bill bill = billRepository.findById(id).get();
+            Bill bill = billRepository.findById(id).orElseThrow();
             bill.setName(request.getName());
             bill.setPrice(request.getPrice());
             bill.setQuantity(request.getQuantity());

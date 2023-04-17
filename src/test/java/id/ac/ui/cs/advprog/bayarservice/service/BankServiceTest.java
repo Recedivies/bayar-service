@@ -3,17 +3,17 @@ package id.ac.ui.cs.advprog.bayarservice.service;
 import id.ac.ui.cs.advprog.bayarservice.dto.Bank.BankRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.BankAlreadyExistsException;
 import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
-import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.repository.BankRepository;
 import id.ac.ui.cs.advprog.bayarservice.service.bank.BankServiceImpl;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
 import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -27,6 +27,23 @@ public class BankServiceTest {
     private BankRepository bankRepository;
 
     Bank bank;
+
+    @Test
+    void whenGetAllBanksShouldReturnListOfBanks() {
+        Bank bank = Bank.builder()
+                .id(1)
+                .name("BNI")
+                .adminFee(5000)
+                .build();
+
+        List<Bank> bankList = List.of(bank);
+
+        when(bankRepository.findAll()).thenReturn(bankList);
+
+        List<Bank> result = bankService.getAll();
+        verify(bankRepository, atLeastOnce()).findAll();
+        Assertions.assertEquals(bankList, result);
+    }
 
     @Test
     void whenCreateBankShouldReturnBank() {
