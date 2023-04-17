@@ -3,6 +3,7 @@ package id.ac.ui.cs.advprog.bayarservice.controller;
 import id.ac.ui.cs.advprog.bayarservice.Util;
 import id.ac.ui.cs.advprog.bayarservice.dto.Bank.BankRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.BankAlreadyExistsException;
+import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.service.bank.BankServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -133,5 +134,62 @@ public class BankControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(handler().methodName("addBank"))
                 .andDo(print());
+    }
+
+    @Test
+    void testDeleteBankByIdShouldReturn200OK () throws Exception {
+        int bankId = 1;
+        String requestURI = END_POINT_PATH + "banks/delete/" + bankId;
+
+        Bank bank = Bank.builder()
+                .id(bankId)
+                .name("BCA")
+                .adminFee(6500)
+                .build();
+
+        when(bankService.findById(bankId)).thenReturn(bank);
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("deleteBankById"))
+                .andDo(print());
+
+        verify(bankService, atLeastOnce()).deleteById(bankId);
+    }
+
+    @Test
+    void testDeleteBankByIdShouldReturn405MethodNotAllowed() throws Exception {
+        int bankId = 1;
+        String requestURI = END_POINT_PATH + "banks/delete/" + bankId;
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(put(requestURI)
+                .contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    void testDeleteBankByIdShouldReturn404NotFound() throws Exception {
+        int bankId = 1;
+        String requestURI = END_POINT_PATH + "banks/delete/" + bankId;
+
+        when(bankService.findById(bankId)).thenThrow(BankDoesNotExistException.class);
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isNotFound())
+                .andExpect(handler().methodName("deleteBankById"))
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        verify(bankService, atMostOnce()).deleteById(bankId);
     }
 }
