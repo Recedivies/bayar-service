@@ -15,18 +15,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InvoiceRequest {
-
-    @NotNull(message = "Id is mandatory")
-    private Integer id;
-
     @NotNull(message = "sessionId is mandatory")
     private UUID sessionId;
 
-    @NotBlank(message = "paymentMethod is mandatory")
     private String paymentMethod;
 
     @Min(0)
-    @NotNull(message = "adminFee is mandatory")
     private Integer adminFee;
 
     @Min(0)
@@ -34,16 +28,16 @@ public class InvoiceRequest {
     private Integer totalAmount;
 
     @Min(0)
-    @NotNull(message = "discount is mandatory")
     private Integer discount;
 
     public Invoice toEntity() {
         Invoice entity = new Invoice();
 
-        entity.setId(this.id);
         entity.setSessionId(this.sessionId);
         entity.setDiscount(this.discount);
-        entity.setPaymentMethod(PaymentMethod.valueOf(this.paymentMethod));
+        if (this.paymentMethod != null) {
+            entity.setPaymentMethod(PaymentMethod.valueOf(this.paymentMethod));
+        }
         entity.setTotalAmount(this.totalAmount);
         entity.setAdminFee(this.adminFee);
 
