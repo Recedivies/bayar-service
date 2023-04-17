@@ -7,13 +7,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
     @NonNull
     List<Invoice> findAll();
     @NonNull
-    Optional<Invoice> findById(@NonNull UUID sessionId);
-    void deleteById(@NonNull UUID sessionId);
+    Optional<Invoice> findById(@NonNull Integer id);
+    void deleteById(@NonNull Integer id);
 }

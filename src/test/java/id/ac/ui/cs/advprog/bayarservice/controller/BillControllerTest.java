@@ -2,13 +2,11 @@ package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
 import id.ac.ui.cs.advprog.bayarservice.dto.Bill.BillRequest;
-import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import id.ac.ui.cs.advprog.bayarservice.service.bill.BillServiceImpl;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
-import id.ac.ui.cs.advprog.bayarservice.service.invoice.InvoiceServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -155,7 +153,7 @@ class BillControllerTest {
     @Test
     void testAddBillShouldReturn200OK() throws Exception {
         int billId = 123;
-        String requestURI = "/api/v1/invoices/{invoiceId}/bills";
+        String requestURI = "/api/v1/bills";
 
         Bill bill = Bill.builder()
                 .id(billId)
@@ -197,7 +195,7 @@ class BillControllerTest {
     @Test
     void testAddBillShouldReturn400BadRequest() throws Exception {
         Bill bill = Bill.builder().build();
-        String requestURI = "/api/v1/invoices/{invoiceId}/bills";
+        String requestURI = "/api/v1/bills";
         String requestBody = Util.mapToJson(bill);
 
         mockMvc.perform(post(requestURI, 1)
@@ -210,7 +208,7 @@ class BillControllerTest {
     @Test
     void testAddBillShouldReturn405MethodNotAllowed() throws Exception {
         int billId = 123;
-        String requestURI = "/api/v1/invoices/{invoiceId}/bills";
+        String requestURI = "/api/v1/bills";
 
         Bill bill = Bill.builder()
                 .id(billId)

@@ -3,6 +3,7 @@ package id.ac.ui.cs.advprog.bayarservice.repository;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
+import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,15 +11,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class BillRepostoryTest {
+public class InvoiceRepositoryTest {
 
-    @Autowired
+    @MockBean
     private BillRepository billRepository;
 
     @Autowired
@@ -26,19 +29,21 @@ public class BillRepostoryTest {
 
     UUID uuid = UUID.randomUUID();
 
+    Invoice invoice;
+
     @BeforeEach
     void setUp() {
-        Invoice invoice = Invoice.builder()
+        invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
+                .paymentStatus(PaymentStatus.UNPAID)
                 .totalAmount(100000)
+                .adminFee(5000)
                 .discount(5000)
                 .sessionId(uuid)
                 .build();
         invoiceRepository.save(invoice);
 
         Bill bill = Bill.builder()
-                .id(1)
                 .name("Coffee")
                 .quantity(5)
                 .price(10000)
@@ -49,21 +54,27 @@ public class BillRepostoryTest {
     }
     @AfterEach
     void tearDown() {
-        billRepository.deleteAll();
         invoiceRepository.deleteAll();
+        billRepository.deleteAll();
     }
 
     @Test
     void testFindById() {
-        Optional<Bill> optionalBill = billRepository.findById(1);
-
-        Assertions.assertTrue(optionalBill.isPresent());
+        Optional<Invoice> optionalInvoice = invoiceRepository.findById(invoice.getId());
+        Assertions.assertTrue(optionalInvoice.isPresent());
     }
 
     @Test
     void testFindByIdNotFound() {
-        Optional<Bill> optionalBill = billRepository.findById(100);
+        Optional<Invoice> optionalInvoice = invoiceRepository.findById(100);
 
-        Assertions.assertFalse(optionalBill.isPresent());
+        Assertions.assertFalse(optionalInvoice.isPresent());
+    }
+
+    @Test
+    void testFindAll() {
+        List<Invoice> optionalInvoiceList = invoiceRepository.findAll();
+
+        Assertions.assertNotNull(optionalInvoiceList);
     }
 }

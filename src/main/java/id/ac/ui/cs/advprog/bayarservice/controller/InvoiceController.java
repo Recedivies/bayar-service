@@ -19,9 +19,11 @@ public class InvoiceController {
     private final InvoiceService invoiceService;
 
     @GetMapping("/invoices/id/{invoiceId}")
-    public ResponseEntity<Invoice> getInvoice(@PathVariable Integer invoiceId) {
+    public ResponseEntity<Object> getInvoiceById(@PathVariable Integer invoiceId) {
         Invoice response = invoiceService.findById(invoiceId);
-        return ResponseEntity.ok(response);
+        return ResponseHandler.generateResponse(new Response(
+                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+        );
     }
 
     @PostMapping(path = "/invoices", consumes = "application/json")
