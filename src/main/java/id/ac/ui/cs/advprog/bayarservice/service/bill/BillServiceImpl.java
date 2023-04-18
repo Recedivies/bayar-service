@@ -29,6 +29,7 @@ public class BillServiceImpl implements BillService {
                 .subTotal(request.getSubTotal())
                 .invoice(invoiceService.findById(request.getInvoiceId()))
                 .build();
+        bill.getInvoice().setTotalAmount((bill.getInvoice().getTotalAmount() + bill.getSubTotal());
         return billRepository.save(bill);
     }
 
