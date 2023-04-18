@@ -28,15 +28,17 @@ public class BankServiceTest {
 
     Bank bank;
 
+    private String bankName = "Bank BCA";
+
     @Test
     void whenGetAllBanksShouldReturnListOfBanks() {
-        Bank bank = Bank.builder()
+        Bank newBank = Bank.builder()
                 .id(1)
                 .name("BNI")
                 .adminFee(5000)
                 .build();
 
-        List<Bank> bankList = List.of(bank);
+        List<Bank> bankList = List.of(newBank);
 
         when(bankRepository.findAll()).thenReturn(bankList);
 
@@ -48,7 +50,7 @@ public class BankServiceTest {
     @Test
     void whenCreateBankShouldReturnBank() {
         BankRequest request = BankRequest.builder()
-                .name("Bank BCA")
+                .name(bankName)
                 .build();
 
         bank = Bank.builder()
@@ -62,7 +64,7 @@ public class BankServiceTest {
     @Test
     void whenCreateBankAlreadyExistShouldThrowBankAlreadyExistException() {
         BankRequest request = BankRequest.builder()
-                .name("Bank BCA")
+                .name(bankName)
                 .build();
 
         bank = Bank.builder()
@@ -75,7 +77,7 @@ public class BankServiceTest {
     @Test
     void whenDeleteAndFoundByIdShouldDeleteBank() {
         bank = Bank.builder()
-                .name("BCA")
+                .name(bankName)
                 .adminFee(3000)
                 .build();
         bankRepository.save(bank);
@@ -97,7 +99,7 @@ public class BankServiceTest {
     @Test
     void whenUpdateAndFoundByIdShouldUpdateBank() {
         BankRequest request = BankRequest.builder()
-                .name("Bank BCA")
+                .name(bankName)
                 .build();
 
         bank = Bank.builder()
@@ -112,7 +114,7 @@ public class BankServiceTest {
     @Test
     void whenUpdateAndNotFoundByIdShouldThrowException() {
         BankRequest request = BankRequest.builder()
-                .name("Bank BCA")
+                .name(bankName)
                 .build();
 
         when(bankRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
@@ -122,7 +124,7 @@ public class BankServiceTest {
     @Test
     void whenUpdateAndFoundByIdButNameAlreadyExistShouldThrowException() {
         BankRequest request = BankRequest.builder()
-                .name("Bank BCA")
+                .name(bankName)
                 .build();
 
         bank = Bank.builder()
