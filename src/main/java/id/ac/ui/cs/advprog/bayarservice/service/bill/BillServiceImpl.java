@@ -23,15 +23,15 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill create(BillRequest request) {
+        Invoice invoice = invoiceService.findById(request.getInvoiceId());
         Bill bill = Bill.builder()
                 .name(request.getName())
                 .price(request.getPrice())
                 .quantity(request.getQuantity())
                 .subTotal(request.getSubTotal())
-                .invoice(invoiceService.findById(request.getInvoiceId()))
+                .invoice(invoice)
                 .build();
         Integer toBeAdded = bill.getSubTotal().intValue();
-        Invoice invoice = bill.getInvoice();
         invoice.setTotalAmount(invoice.getTotalAmount() + toBeAdded);
         return billRepository.save(bill);
     }
