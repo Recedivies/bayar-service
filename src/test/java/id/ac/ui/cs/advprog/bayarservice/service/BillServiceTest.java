@@ -30,7 +30,7 @@ public class BillServiceTest {
     @Mock
     private BillRepository billRepository;
 
-    @InjectMocks
+    @Mock
     private InvoiceServiceImpl invoiceService;
 
     Bill bill;
