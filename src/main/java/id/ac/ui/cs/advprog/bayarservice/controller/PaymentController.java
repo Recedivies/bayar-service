@@ -35,4 +35,12 @@ public class PaymentController {
                 "Payment processed successfully!", HttpStatus.CREATED, "SUCCESS", paymentHistory)
         );
     }
+
+    @GetMapping("/log/paymentLog")
+    public ResponseEntity<Object> getPaymentLog() {
+        List<PaymentHistory> response = paymentService.getPaymentLog();
+        return ResponseHandler.generateResponse(new Response(
+                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+        );
+    }
 }

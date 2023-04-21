@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,5 +59,10 @@ public class PaymentServiceImpl implements Payment {
                 .invoice(invoice)
                 .build();
         return this.paymentRepository.save(paymentHistory);
+    }
+
+    @Override
+    public List<PaymentHistory> getPaymentLog() {
+        return this.paymentRepository.findAll();
     }
 }

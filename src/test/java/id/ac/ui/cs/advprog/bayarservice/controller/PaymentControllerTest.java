@@ -14,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
@@ -107,6 +108,74 @@ class PaymentControllerTest {
         String requestURI = END_POINT_PATH + "/invoices/" + invoiceId + "/payments";
 
         mockMvc.perform(get(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetLogPaymentShouldReturn200OK() throws Exception {
+        int invoiceId = 123;
+        String requestURI = END_POINT_PATH + "/log/paymentLog";
+
+        Invoice invoice = Invoice.builder()
+                .paymentMethod(PaymentMethod.CASH)
+                .adminFee(5000)
+                .totalAmount(100000L)
+                .discount(5000L)
+                .sessionId(UUID.randomUUID())
+                .build();
+
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .totalAmount(100000L)
+                .sessionId(UUID.randomUUID())
+                .paymentMethod(String.valueOf(PaymentMethod.CASH))
+                .build();
+
+        PaymentHistory paymentHistory = PaymentHistory.builder()
+                .totalAmount(100000L)
+                .sessionId(UUID.randomUUID())
+                .invoice(invoice)
+                .build();
+
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+
+        String requestBody = Util.mapToJson(paymentRequest);
+
+        mockMvc.perform(post(END_POINT_PATH + "/invoices/" + invoiceId + "/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isCreated())
+                .andExpect(handler().methodName("createPayment"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+
+        verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
+
+        when(paymentService.getPaymentLog()).thenReturn(List.of(paymentHistory));
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("getPaymentLog"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetLogPaymentShouldReturn405MethodNotAllowed() throws Exception {
+        String requestURI = END_POINT_PATH + "/log/paymentLog";
+
+        mockMvc.perform(post(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(put(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(delete(requestURI))
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(jsonPath("$.status").value("FAILED"))
                 .andDo(print());

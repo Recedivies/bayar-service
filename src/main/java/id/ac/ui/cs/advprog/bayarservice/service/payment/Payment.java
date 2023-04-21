@@ -8,4 +8,5 @@ import java.util.List;
 public interface Payment {
     List<String> getPaymentMethods();
     PaymentHistory create(Integer invoiceId, PaymentRequest request);
+    List<PaymentHistory> getPaymentLog();
 }
