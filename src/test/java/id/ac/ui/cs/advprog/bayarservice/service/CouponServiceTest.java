@@ -2,8 +2,9 @@ package id.ac.ui.cs.advprog.bayarservice.service;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.coupon.CouponRequest;
 import id.ac.ui.cs.advprog.bayarservice.dto.coupon.UseCouponRequest;
-import id.ac.ui.cs.advprog.bayarservice.exception.CouponAlreadyUsedException;
-import id.ac.ui.cs.advprog.bayarservice.exception.CouponDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyUsedException;
+import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.coupon.Coupon;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
@@ -95,6 +96,13 @@ public class CouponServiceTest {
         Coupon result = couponService.update(0, updateRequest);
         verify(couponRepository, atLeastOnce()).save(any(Coupon.class));
         Assertions.assertEquals(newCoupon, result);
+    }
+
+    @Test
+    void whenUpdateCouponAndCouponNameAlreadyExistShouldThrowException() {
+        when(couponRepository.findByName(any(String.class))).thenReturn(Optional.of(coupon));
+        Assertions.assertThrows(CouponAlreadyExistException.class,
+                () -> couponService.update(0, updateRequest));
     }
 
     @Test

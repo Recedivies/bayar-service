@@ -1,4 +1,4 @@
-package id.ac.ui.cs.advprog.bayarservice.exception;
+package id.ac.ui.cs.advprog.bayarservice.exception.coupon;
 
 public class CouponDoesNotExistException extends RuntimeException {
     public CouponDoesNotExistException(Integer couponId) {

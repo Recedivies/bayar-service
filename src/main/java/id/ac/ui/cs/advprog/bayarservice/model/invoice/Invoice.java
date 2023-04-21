@@ -49,7 +49,7 @@ public class Invoice {
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer adminFee = 0;
 
-    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
+    @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     private Long discount = 0L;
 
     @JsonManagedReference

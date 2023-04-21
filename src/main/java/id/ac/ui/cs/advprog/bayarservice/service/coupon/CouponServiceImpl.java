@@ -2,8 +2,9 @@ package id.ac.ui.cs.advprog.bayarservice.service.coupon;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.coupon.CouponRequest;
 import id.ac.ui.cs.advprog.bayarservice.dto.coupon.UseCouponRequest;
-import id.ac.ui.cs.advprog.bayarservice.exception.CouponAlreadyUsedException;
-import id.ac.ui.cs.advprog.bayarservice.exception.CouponDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyUsedException;
+import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.coupon.Coupon;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
@@ -33,9 +34,14 @@ public class CouponServiceImpl implements  CouponService {
 
     @Override
     public Coupon update(Integer id, CouponRequest request) {
+        if (isCouponAlreadyExist(request.getName())) {
+            throw new CouponAlreadyExistException(request.getName());
+        }
+
         Coupon coupon = this.findById(id);
         coupon.setName(request.getName());
         coupon.setDiscount(request.getDiscount());
+
         return this.couponRepository.save(coupon);
     }
 
@@ -53,6 +59,10 @@ public class CouponServiceImpl implements  CouponService {
         coupon.setUsed(true);
         this.couponRepository.save(coupon);
         this.invoiceRepository.save(invoice);
+    }
+
+    private boolean isCouponAlreadyExist(String name) {
+        return this.couponRepository.findByName(name).isPresent();
     }
 
     private void handleInvoiceDiscount(Invoice invoice, long discountCoupon) {
