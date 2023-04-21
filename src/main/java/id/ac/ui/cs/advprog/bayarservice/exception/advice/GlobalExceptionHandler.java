@@ -1,6 +1,9 @@
 package id.ac.ui.cs.advprog.bayarservice.exception.advice;
 
 import id.ac.ui.cs.advprog.bayarservice.exception.*;
+import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyUsedException;
+import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.util.Response;
 import id.ac.ui.cs.advprog.bayarservice.util.ResponseHandler;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -22,7 +25,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {
             BillDoesNotExistException.class,
             BankDoesNotExistException.class,
-            InvoiceDoesNotExistException.class
+            InvoiceDoesNotExistException.class,
+            CouponDoesNotExistException.class,
     })
     public ResponseEntity<Object> notAvailableHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
@@ -34,6 +38,7 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException.class,
             InvalidPaymentMethodException.class,
             HttpMessageNotReadableException.class,
+            CouponAlreadyUsedException.class,
     })
     public ResponseEntity<Object> badRequestHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
@@ -67,8 +72,11 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(value = {BankAlreadyExistsException.class})
-    public ResponseEntity<Object> bankAlreadyExists(Exception exception) {
+    @ExceptionHandler(value = {
+            BankAlreadyExistsException.class,
+            CouponAlreadyExistException.class,
+    })
+    public ResponseEntity<Object> alreadyExistResourceException(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
                 exception.getMessage(), HttpStatus.CONFLICT, "FAILED", null)
         );

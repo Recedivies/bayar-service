@@ -34,8 +34,8 @@ public class BillRepositoryTest {
                 .paymentMethod(PaymentMethod.CASH)
                 .paymentStatus(PaymentStatus.UNPAID)
                 .adminFee(5000)
-                .totalAmount(100000)
-                .discount(5000)
+                .totalAmount(100000L)
+                .discount(5000L)
                 .sessionId(uuid)
                 .build();
         invoiceRepository.save(invoice);

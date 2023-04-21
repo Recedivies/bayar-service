@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -41,33 +42,33 @@ public class InvoiceServiceTest {
     void setUp() {
         createRequest = InvoiceRequest.builder()
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
-                .totalAmount(100000)
+                .totalAmount(100000L)
                 .adminFee(5000)
-                .discount(5000)
+                .discount(5000L)
                 .build();
 
         updateRequest = InvoiceRequest.builder()
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
-                .totalAmount(210000)
+                .totalAmount(210000L)
                 .adminFee(20000)
-                .discount(10000)
+                .discount(10000L)
                 .build();
 
         invoice = Invoice.builder()
                 .id(1)
                 .paymentMethod(PaymentMethod.CASH)
                 .paymentStatus(PaymentStatus.UNPAID)
-                .totalAmount(100000)
+                .totalAmount(100000L)
                 .adminFee(5000)
-                .discount(5000)
+                .discount(5000L)
                 .build();
 
         newInvoice = Invoice.builder()
                 .id(1)
                 .paymentMethod(PaymentMethod.CASH)
-                .totalAmount(210000)
+                .totalAmount(210000L)
                 .adminFee(20000)
-                .discount(10000)
+                .discount(10000L)
                 .build();
 
         bill = Bill.builder()
@@ -120,6 +121,24 @@ public class InvoiceServiceTest {
         when(invoiceRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
 
         Assertions.assertThrows(InvoiceDoesNotExistException.class, () -> invoiceService.findById(1));
+    }
+
+    @Test
+    void whenFindBySessionIdAndFoundShouldReturnInvoice() {
+        when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
+
+        Invoice result = invoiceService.findBySessionId(UUID.randomUUID());
+
+        verify(invoiceRepository, atLeastOnce()).findBySessionId(any(UUID.class));
+        Assertions.assertEquals(invoice, result);
+    }
+
+    @Test
+    void whenFindBySessionIdAndNotFoundShouldThrowException() {
+        when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(InvoiceDoesNotExistException.class,
+                () -> invoiceService.findBySessionId(UUID.randomUUID()));
     }
 }
 

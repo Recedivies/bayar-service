@@ -25,10 +25,10 @@ public class InvoiceRequest {
 
     @Min(0)
     @NotNull(message = "totalAmount is mandatory")
-    private Integer totalAmount;
+    private Long totalAmount;
 
     @Min(0)
-    private Integer discount;
+    private Long discount;
 
     public Invoice toEntity() {
         Invoice entity = new Invoice();
