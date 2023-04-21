@@ -2,6 +2,7 @@ package id.ac.ui.cs.advprog.bayarservice.service;
 
 import id.ac.ui.cs.advprog.bayarservice.core.PaymentReceiver;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
+import id.ac.ui.cs.advprog.bayarservice.exception.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentHistory;
@@ -91,5 +92,13 @@ public class PaymentServiceTest {
 
         verify(paymentRepository, atLeastOnce()).save(any(PaymentHistory.class));
         Assertions.assertEquals(paymentHistory, result);
+    }
+
+    @Test
+    void whenCreatePaymentShouldReturn404InvoiceNotFound() {
+        when(invoiceRepository.findById(any())).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(InvoiceDoesNotExistException.class,
+                () -> paymentService.create(0, createRequest));
     }
 }
