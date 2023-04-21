@@ -35,6 +35,7 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException.class,
             InvalidPaymentMethodException.class,
             HttpMessageNotReadableException.class,
+            CouponAlreadyUsedException.class
     })
     public ResponseEntity<Object> badRequestHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
