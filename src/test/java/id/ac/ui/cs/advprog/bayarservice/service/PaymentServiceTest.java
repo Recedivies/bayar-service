@@ -49,9 +49,9 @@ public class PaymentServiceTest {
     void setUp() {
         invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .totalAmount(100000)
+                .totalAmount(100000L)
                 .adminFee(5000)
-                .discount(5000)
+                .discount(5000L)
                 .build();
 
         createRequest = PaymentRequest.builder()

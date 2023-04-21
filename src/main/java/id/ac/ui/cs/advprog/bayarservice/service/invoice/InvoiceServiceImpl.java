@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,12 @@ public class InvoiceServiceImpl implements InvoiceService {
             throw new InvoiceDoesNotExistException(id);
         }
         return invoice.get();
+    }
+
+    @Override
+    public Invoice findBySessionId(UUID sessionId) {
+        return this.invoiceRepository.findBySessionId(sessionId)
+                .orElseThrow(() -> new InvoiceDoesNotExistException(sessionId));
     }
 
     @Override

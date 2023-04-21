@@ -30,31 +30,41 @@ public class Invoice {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+
     @Column(columnDefinition = "VARCHAR(5)")
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
+
     @Column(columnDefinition = "VARCHAR(10) default 'UNPAID'")
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE default CURRENT_TIMESTAMP")
     private Date createdAt;
+
     @Column(nullable = false)
-    private Integer totalAmount;
+    private Long totalAmount;
+
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer adminFee = 0;
+
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
-    private Integer discount = 0;
+    private Long discount = 0L;
+
     @JsonManagedReference
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
     private List<Bill> bills;
+
     @JsonManagedReference
     @JsonIgnore
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
     private List<PaymentHistory> paymentHistories;
+
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
     private UUID sessionId;
+
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "bank_id")

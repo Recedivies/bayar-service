@@ -22,7 +22,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {
             BillDoesNotExistException.class,
             BankDoesNotExistException.class,
-            InvoiceDoesNotExistException.class
+            InvoiceDoesNotExistException.class,
+            CouponDoesNotExistException.class
     })
     public ResponseEntity<Object> notAvailableHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
