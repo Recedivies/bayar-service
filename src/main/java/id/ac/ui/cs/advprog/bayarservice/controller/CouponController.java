@@ -32,7 +32,7 @@ public class CouponController {
     public ResponseEntity<Object> useCoupon(@PathVariable UUID sessionId, @RequestBody @Valid UseCouponRequest request) {
         couponService.useCoupon(sessionId, request);
         return ResponseHandler.generateResponse(new Response(
-                "Success created invoice", HttpStatus.OK, "SUCCESS", null)
+                "Success Used Coupon", HttpStatus.OK, "SUCCESS", null)
         );
     }
 }
