@@ -171,8 +171,8 @@ class BillControllerTest {
                 .id(1)
                 .paymentMethod(PaymentMethod.CASH)
                 .adminFee(5000)
-                .totalAmount(100000)
-                .discount(5000)
+                .totalAmount(100000L)
+                .discount(5000L)
                 .sessionId(UUID.randomUUID())
                 .build();
         invoiceRepository.save(invoice);

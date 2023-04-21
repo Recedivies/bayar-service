@@ -9,7 +9,6 @@ import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentStatus;
 import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentHistory;
 import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import id.ac.ui.cs.advprog.bayarservice.repository.PaymentRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +17,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-@RequiredArgsConstructor
 public class PaymentServiceImpl implements Payment {
-    private PaymentRepository paymentRepository;
-    private InvoiceRepository invoiceRepository;
-    private PaymentReceiver paymentReceiver;
+
+    private final PaymentRepository paymentRepository;
+
+    private final InvoiceRepository invoiceRepository;
+
+    private final PaymentReceiver paymentReceiver;
+
     @Autowired
     public PaymentServiceImpl(
                               PaymentRepository paymentRepository,

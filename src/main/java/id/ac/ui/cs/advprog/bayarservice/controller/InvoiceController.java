@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -21,6 +23,14 @@ public class InvoiceController {
     @GetMapping("/invoices/id/{invoiceId}")
     public ResponseEntity<Object> getInvoiceById(@PathVariable Integer invoiceId) {
         Invoice response = invoiceService.findById(invoiceId);
+        return ResponseHandler.generateResponse(new Response(
+                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+        );
+    }
+
+    @GetMapping("/invoices/{sessionId}")
+    public ResponseEntity<Object> getInvoiceBySessionId(@PathVariable UUID sessionId) {
+        Invoice response = invoiceService.findBySessionId(sessionId);
         return ResponseHandler.generateResponse(new Response(
                 "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
         );
