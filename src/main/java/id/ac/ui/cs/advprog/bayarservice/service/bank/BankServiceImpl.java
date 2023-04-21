@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -44,32 +45,23 @@ public class BankServiceImpl implements BankService {
 
     @Override
     public Bank findById(Integer id) {
-        Optional<Bank> bank = bankRepository.findById(id);
-        if (bank.isEmpty()) {
-            throw new BankDoesNotExistException(id);
-        }
-        return bank.get();
+        return this.bankRepository.findById(id)
+                .orElseThrow(() -> new BankDoesNotExistException(id));
     }
 
     @Override
     public Bank update(Integer id, BankRequest request) {
-        if (isBankDoesNotExist(id)) {
-            throw new BankDoesNotExistException(id);
+        Bank bank = this.bankRepository.findById(id)
+                .orElseThrow(() -> new BankDoesNotExistException(id));
+        Optional<Bank> bankByName = this.bankRepository.findByName(request.getName());
+
+        if (bankByName.isPresent() && !Objects.equals(bankByName.get().getId(), id)) {
+            throw new BankAlreadyExistsException(request.getName());
         }
-        else {
-            if (bankRepository.findById(id).isPresent()) {
-                if (isBankAlreadyExist(request.getName()) && !id.equals(bankRepository.findByName(request.getName()).get().getId())) {
-                    throw new BankAlreadyExistsException(request.getName());
-                }
-                Bank bank = bankRepository.findById(id).get();
-                bank.setName(request.getName());
-                bank.setAdminFee(request.getAdminFee());
-                return bankRepository.save(bank);
-            }
-            else {
-                throw new BankDoesNotExistException(id);
-            }
-        }
+
+        bank.setName(request.getName());
+        bank.setAdminFee(request.getAdminFee());
+        return bankRepository.save(bank);
     }
 
     private boolean isBankAlreadyExist(String name) {
