@@ -8,7 +8,7 @@ public class InvoiceDoesNotExistException extends RuntimeException {
     }
 
     public InvoiceDoesNotExistException(UUID sessionId) {
-        super("Invoice with id " + sessionId + " does not exist");
+        super("Invoice with sessionId " + sessionId + " does not exist");
     }
 }
 
