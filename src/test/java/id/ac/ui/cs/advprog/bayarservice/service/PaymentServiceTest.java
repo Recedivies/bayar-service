@@ -101,4 +101,13 @@ public class PaymentServiceTest {
         Assertions.assertThrows(InvoiceDoesNotExistException.class,
                 () -> paymentService.create(0, createRequest));
     }
+
+    @Test
+    void whenGetPaymentLogShouldReturnListOfAllPaymentLog() {
+        when(paymentRepository.findAll()).thenReturn(List.of(paymentHistory));
+
+        List<PaymentHistory> result = paymentService.getPaymentLog();
+
+        Assertions.assertEquals(List.of(paymentHistory), result);
+    }
 }

@@ -48,7 +48,7 @@ public class BillServiceTest {
 
         invoice = Invoice.builder()
                 .id(1)
-                .totalAmount(50000)
+                .totalAmount(50000L)
                 .build();
     }
 
