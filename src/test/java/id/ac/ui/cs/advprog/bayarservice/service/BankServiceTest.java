@@ -20,6 +20,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BankServiceTest {
+
     @InjectMocks
     private BankServiceImpl bankService;
 
@@ -28,15 +29,17 @@ public class BankServiceTest {
 
     Bank bank;
 
+    private final String bankName = "Bank BCA";
+
     @Test
     void whenGetAllBanksShouldReturnListOfBanks() {
-        Bank bank = Bank.builder()
+        Bank newBank = Bank.builder()
                 .id(1)
                 .name("BNI")
                 .adminFee(5000)
                 .build();
 
-        List<Bank> bankList = List.of(bank);
+        List<Bank> bankList = List.of(newBank);
 
         when(bankRepository.findAll()).thenReturn(bankList);
 
@@ -46,9 +49,31 @@ public class BankServiceTest {
     }
 
     @Test
+    void whenFindByIdAndFoundShouldReturnBank() {
+        bank = Bank.builder()
+                .id(0)
+                .name(bankName)
+                .build();
+
+        when(bankRepository.findById(any(Integer.class))).thenReturn(Optional.of(bank));
+
+        Bank result = bankService.findById(bank.getId());
+
+        verify(bankRepository, atLeastOnce()).findById(any(Integer.class));
+        Assertions.assertEquals(bank, result);
+    }
+
+    @Test
+    void whenFindByIdAndNotFoundShouldThrowException() {
+        when(bankRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(BankDoesNotExistException.class, () -> bankService.findById(1));
+    }
+
+    @Test
     void whenCreateBankShouldReturnBank() {
         BankRequest request = BankRequest.builder()
-                .name("Bank BCA")
+                .name(bankName)
                 .build();
 
         bank = Bank.builder()
@@ -62,7 +87,7 @@ public class BankServiceTest {
     @Test
     void whenCreateBankAlreadyExistShouldThrowBankAlreadyExistException() {
         BankRequest request = BankRequest.builder()
-                .name("Bank BCA")
+                .name(bankName)
                 .build();
 
         bank = Bank.builder()
@@ -75,7 +100,7 @@ public class BankServiceTest {
     @Test
     void whenDeleteAndFoundByIdShouldDeleteBank() {
         bank = Bank.builder()
-                .name("BCA")
+                .name(bankName)
                 .adminFee(3000)
                 .build();
         bankRepository.save(bank);
@@ -97,7 +122,7 @@ public class BankServiceTest {
     @Test
     void whenUpdateAndFoundByIdShouldUpdateBank() {
         BankRequest request = BankRequest.builder()
-                .name("Bank BCA")
+                .name(bankName)
                 .build();
 
         bank = Bank.builder()
@@ -112,7 +137,7 @@ public class BankServiceTest {
     @Test
     void whenUpdateAndNotFoundByIdShouldThrowException() {
         BankRequest request = BankRequest.builder()
-                .name("Bank BCA")
+                .name(bankName)
                 .build();
 
         when(bankRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
@@ -122,7 +147,7 @@ public class BankServiceTest {
     @Test
     void whenUpdateAndFoundByIdButNameAlreadyExistShouldThrowException() {
         BankRequest request = BankRequest.builder()
-                .name("Bank BCA")
+                .name(bankName)
                 .build();
 
         bank = Bank.builder()
@@ -133,4 +158,25 @@ public class BankServiceTest {
         Assertions.assertThrows(BankAlreadyExistsException.class, () -> bankService.update(1, request));
     }
 
+    @Test
+    void whenUpdateAndFoundByIdAndNameDoesNotExist() {
+        BankRequest request = BankRequest.builder()
+                .name(bankName)
+                .build();
+
+        bank = Bank.builder()
+                .id(1)
+                .name(request.getName())
+                .build();
+
+        Bank bank2 = Bank.builder()
+                .id(2)
+                .name(request.getName())
+                .build();
+        when(bankRepository.findById(any(Integer.class))).thenReturn(Optional.of(bank));
+        when(bankRepository.findByName(any(String.class))).thenReturn(Optional.of(bank2));
+        when(bankRepository.save(any(Bank.class))).thenReturn(bank);
+        Bank result = bankService.update(2, request);
+        Assertions.assertEquals(bank, result);
+    }
 }

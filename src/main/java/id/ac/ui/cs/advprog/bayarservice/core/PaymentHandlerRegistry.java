@@ -15,8 +15,13 @@ public class PaymentHandlerRegistry {
 
     public Optional<PaymentStrategy> getHandlerFor(PaymentRequest request) {
         return requestHandlers.stream()
-                .filter(handler -> handler.supportedPaymentMethodType().
-                        equals(PaymentMethod.valueOf(request.getPaymentMethod())))
-                .findAny();
+                .filter(handler -> {
+                    try {
+                        return handler.supportedPaymentMethodType().
+                                equals(PaymentMethod.valueOf(request.getPaymentMethod()));
+                    } catch (IllegalArgumentException e) {
+                        return false;
+                    }
+                }).findAny();
     }
 }
