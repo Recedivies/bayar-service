@@ -36,9 +36,9 @@ public class InvoiceRepositoryTest {
         invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
                 .paymentStatus(PaymentStatus.UNPAID)
-                .totalAmount(100000)
+                .totalAmount(100000L)
                 .adminFee(5000)
-                .discount(5000)
+                .discount(5000L)
                 .sessionId(uuid)
                 .build();
         invoiceRepository.save(invoice);
@@ -76,5 +76,18 @@ public class InvoiceRepositoryTest {
         List<Invoice> optionalInvoiceList = invoiceRepository.findAll();
 
         Assertions.assertNotNull(optionalInvoiceList);
+    }
+
+    @Test
+    void testFindBySessionId() {
+        Optional<Invoice> optionalInvoice = invoiceRepository.findBySessionId(invoice.getSessionId());
+        Assertions.assertTrue(optionalInvoice.isPresent());
+    }
+
+    @Test
+    void testFindBySessionIdNotFound() {
+        Optional<Invoice> optionalInvoice = invoiceRepository.findBySessionId(UUID.randomUUID());
+
+        Assertions.assertFalse(optionalInvoice.isPresent());
     }
 }
