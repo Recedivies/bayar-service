@@ -86,6 +86,7 @@ public class BillServiceTest {
 
     @Test
     void whenCreateBillShouldReturnBill() {
+        when(invoiceService.findById(any(Integer.class))).thenReturn(invoice);
         when(billRepository.save(any(Bill.class))).thenReturn(bill);
         BillRequest billRequest = new BillRequest("Coffee", 5, 10000, 50000L, 1);
         Bill result = billService.create(billRequest);
