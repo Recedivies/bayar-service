@@ -61,6 +61,28 @@ public class CouponServiceImpl implements  CouponService {
         this.invoiceRepository.save(invoice);
     }
 
+    @Override
+    public Coupon createCoupon(CouponRequest request) {
+        if (isCouponAlreadyExist(request.getName())) {
+            throw new CouponAlreadyExistException(request.getName());
+        }
+
+        Coupon coupon = Coupon.builder()
+                .name(request.getName())
+                .discount(request.getDiscount())
+                .build();
+
+        return this.couponRepository.save(coupon);
+    }
+
+    @Override
+    public void deleteCoupon(Integer id) {
+        if (!this.couponRepository.findById(id).isPresent()) {
+            throw new CouponDoesNotExistException(id);
+        }
+        this.couponRepository.deleteById(id);
+    }
+
     private boolean isCouponAlreadyExist(String name) {
         return this.couponRepository.findByName(name).isPresent();
     }

@@ -10,4 +10,6 @@ public interface CouponService {
     Coupon findById(Integer id);
     Coupon update(Integer id, CouponRequest request);
     void useCoupon(UUID id, UseCouponRequest request);
+    Coupon createCoupon(CouponRequest request);
+    void deleteCoupon(Integer id);
 }
