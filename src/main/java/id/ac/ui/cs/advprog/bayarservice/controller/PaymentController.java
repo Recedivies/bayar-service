@@ -43,4 +43,28 @@ public class PaymentController {
                 "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
         );
     }
+
+    @GetMapping("/log/paymentLog/monthly/{year}/{month}")
+    public ResponseEntity<Object> getPaymentLogByYearAndMonth(@PathVariable Integer year, @PathVariable Integer month) {
+        List<PaymentHistory> response = paymentService.getPaymentLogByYearAndMonth(year, month);
+        return ResponseHandler.generateResponse(new Response(
+                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+        );
+    }
+
+    @GetMapping("/log/paymentLog/{year}")
+    public ResponseEntity<Object> getPaymentLogByYear(@PathVariable Integer year) {
+        List<PaymentHistory> response = paymentService.getPaymentLogByYear(year);
+        return ResponseHandler.generateResponse(new Response(
+                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+        );
+    }
+
+    @GetMapping("/log/paymentLog/weekly/{year}/{week}")
+    public ResponseEntity<Object> getPaymentLogByWeekAndYear(@PathVariable Integer year, @PathVariable Integer week) {
+        List<PaymentHistory> response = paymentService.getPaymentLogByWeekAndYear(year, week);
+        return ResponseHandler.generateResponse(new Response(
+                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+        );
+    }
 }

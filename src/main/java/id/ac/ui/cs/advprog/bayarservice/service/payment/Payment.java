@@ -9,4 +9,7 @@ public interface Payment {
     List<String> getPaymentMethods();
     PaymentHistory create(Integer invoiceId, PaymentRequest request);
     List<PaymentHistory> getPaymentLog();
+    List<PaymentHistory> getPaymentLogByYearAndMonth(int year, int month);
+    List<PaymentHistory> getPaymentLogByYear(int year);
+    List<PaymentHistory> getPaymentLogByWeekAndYear(int year, int week);
 }
