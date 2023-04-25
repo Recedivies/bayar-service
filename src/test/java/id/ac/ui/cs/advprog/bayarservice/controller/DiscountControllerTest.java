@@ -42,8 +42,8 @@ public class DiscountControllerTest {
         String requestBody = Util.mapToJson(discountRequest);
 
         mockMvc.perform(post(requestURI)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("giveDiscount"))
                 .andExpect(jsonPath("$.status").value("SUCCESS"))
