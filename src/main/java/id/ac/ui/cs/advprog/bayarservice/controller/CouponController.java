@@ -35,4 +35,20 @@ public class CouponController {
                 "Success Used Coupon", HttpStatus.OK, "SUCCESS", null)
         );
     }
+
+    @PostMapping("/coupons/createCoupon")
+    public ResponseEntity<Object> createCoupon(@RequestBody @Valid CouponRequest request) {
+        Coupon coupon = couponService.createCoupon(request);
+        return ResponseHandler.generateResponse(new Response(
+                "Success created coupon", HttpStatus.CREATED, "SUCCESS", coupon)
+        );
+    }
+
+    @DeleteMapping("/coupons/delete/{couponId}")
+    public ResponseEntity<Object> deleteCoupon(@PathVariable Integer couponId) {
+        couponService.deleteCoupon(couponId);
+        return ResponseHandler.generateResponse(new Response(
+                "Success deleted coupon", HttpStatus.OK, "SUCCESS", null)
+        );
+    }
 }

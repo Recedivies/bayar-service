@@ -14,6 +14,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
@@ -111,4 +117,291 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$.status").value("FAILED"))
                 .andDo(print());
     }
+
+    @Test
+    public void testGetLogPaymentShouldReturn200OK() throws Exception {
+        int invoiceId = 123;
+        String requestURI = END_POINT_PATH + "/log/paymentLog";
+
+        Invoice invoice = Invoice.builder()
+                .paymentMethod(PaymentMethod.CASH)
+                .adminFee(5000)
+                .totalAmount(100000L)
+                .discount(5000L)
+                .sessionId(UUID.randomUUID())
+                .build();
+
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .totalAmount(100000L)
+                .sessionId(UUID.randomUUID())
+                .paymentMethod(String.valueOf(PaymentMethod.CASH))
+                .build();
+
+        PaymentHistory paymentHistory = PaymentHistory.builder()
+                .totalAmount(100000L)
+                .sessionId(UUID.randomUUID())
+                .createdAt(new Date(Instant.now().toEpochMilli()))
+                .invoice(invoice)
+                .build();
+
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+
+        String requestBody = Util.mapToJson(paymentRequest);
+
+        mockMvc.perform(post(END_POINT_PATH + "/invoices/" + invoiceId + "/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isCreated())
+                .andExpect(handler().methodName("createPayment"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+
+        verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
+
+        when(paymentService.getPaymentLog()).thenReturn(List.of(paymentHistory));
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("getPaymentLog"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetLogPaymentShouldReturn405MethodNotAllowed() throws Exception {
+        String requestURI = END_POINT_PATH + "/log/paymentLog";
+
+        mockMvc.perform(post(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(put(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+    }
+    @Test
+    public void testGetLogPaymentByYearAndMonthShouldReturn200OK() throws Exception {
+        int invoiceId = 123;
+        int year = LocalDate.now().getYear();
+        int month = LocalDate.now().getMonthValue();
+        String requestURI = END_POINT_PATH + "/log/paymentLog/monthly/" + year + "/" + month;
+
+        Invoice invoice = Invoice.builder()
+                .paymentMethod(PaymentMethod.CASH)
+                .adminFee(5000)
+                .totalAmount(100000L)
+                .discount(5000L)
+                .sessionId(UUID.randomUUID())
+                .build();
+
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .totalAmount(100000L)
+                .sessionId(UUID.randomUUID())
+                .paymentMethod(String.valueOf(PaymentMethod.CASH))
+                .build();
+
+        PaymentHistory paymentHistory = PaymentHistory.builder()
+                .totalAmount(100000L)
+                .sessionId(UUID.randomUUID())
+                .createdAt(new Date(Instant.now().toEpochMilli()))
+                .invoice(invoice)
+                .createdAt(new Date(Instant.now().toEpochMilli()))
+                .build();
+
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+
+        String requestBody = Util.mapToJson(paymentRequest);
+
+        mockMvc.perform(post(END_POINT_PATH + "/invoices/" + invoiceId + "/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isCreated())
+                .andExpect(handler().methodName("createPayment"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+
+        verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
+
+        when(paymentService.getPaymentLogByYearAndMonth(any(Integer.class), any(Integer.class))).thenReturn(List.of(paymentHistory));
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("getPaymentLogByYearAndMonth"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetLogPaymentByYearAndMonthShouldReturn405MethodNotAllowed() throws Exception {
+        int year = LocalDate.now().getYear();
+        int month = LocalDate.now().getMonthValue();
+        String requestURI = END_POINT_PATH + "/log/paymentLog/monthly/" + year + "/" + month;
+
+        mockMvc.perform(post(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(put(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetLogPaymentByYearShouldReturn200K() throws Exception {
+        int invoiceId = 123;
+        int year = LocalDate.now().getYear();
+        String requestURI = END_POINT_PATH + "/log/paymentLog/" + year;
+
+        Invoice invoice = Invoice.builder()
+                .paymentMethod(PaymentMethod.CASH)
+                .adminFee(5000)
+                .totalAmount(100000L)
+                .discount(5000L)
+                .sessionId(UUID.randomUUID())
+                .build();
+
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .totalAmount(100000L)
+                .sessionId(UUID.randomUUID())
+                .paymentMethod(String.valueOf(PaymentMethod.CASH))
+                .build();
+
+        PaymentHistory paymentHistory = PaymentHistory.builder()
+                .totalAmount(100000L)
+                .sessionId(UUID.randomUUID())
+                .createdAt(new Date(Instant.now().toEpochMilli()))
+                .invoice(invoice)
+                .build();
+
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+
+        String requestBody = Util.mapToJson(paymentRequest);
+
+        mockMvc.perform(post(END_POINT_PATH + "/invoices/" + invoiceId + "/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isCreated())
+                .andExpect(handler().methodName("createPayment"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+
+        verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
+
+        when(paymentService.getPaymentLogByYear(any(Integer.class))).thenReturn(List.of(paymentHistory));
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("getPaymentLogByYear"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetLogPaymentByYearShouldReturn405MethodNotAllowed() throws Exception {
+        int year = LocalDate.now().getYear();
+        String requestURI = END_POINT_PATH + "/log/paymentLog/" + year;
+
+        mockMvc.perform(post(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(put(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetLogPaymentByWeekAndYearShouldReturn2000K () throws Exception {
+        int invoiceId = 123;
+        int year = LocalDate.now().getYear();
+        int week = LocalDate.now().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
+        String requestURI = END_POINT_PATH + "/log/paymentLog/weekly/" + year + "/" + week;
+
+        Invoice invoice = Invoice.builder()
+                .paymentMethod(PaymentMethod.CASH)
+                .adminFee(5000)
+                .totalAmount(100000L)
+                .discount(5000L)
+                .sessionId(UUID.randomUUID())
+                .build();
+
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .totalAmount(100000L)
+                .sessionId(UUID.randomUUID())
+                .paymentMethod(String.valueOf(PaymentMethod.CASH))
+                .build();
+
+        PaymentHistory paymentHistory = PaymentHistory.builder()
+                .totalAmount(100000L)
+                .sessionId(UUID.randomUUID())
+                .createdAt(new Date(Instant.now().toEpochMilli()))
+                .invoice(invoice)
+                .build();
+
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+
+        String requestBody = Util.mapToJson(paymentRequest);
+
+        mockMvc.perform(post(END_POINT_PATH + "/invoices/" + invoiceId + "/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isCreated())
+                .andExpect(handler().methodName("createPayment"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+
+        verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
+
+        when(paymentService.getPaymentLogByWeekAndYear(any(Integer.class), any(Integer.class))).thenReturn(List.of(paymentHistory));
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("getPaymentLogByWeekAndYear"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetLogPaymentByWeekAndYearShouldReturn405MethodNotAllowed() throws Exception {
+        int year = LocalDate.now().getYear();
+        int week = LocalDate.now().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
+        String requestURI = END_POINT_PATH + "/log/paymentLog/weekly/" + year + "/" + week;
+
+        mockMvc.perform(post(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(put(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+    }
+
 }

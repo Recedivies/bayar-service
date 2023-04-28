@@ -12,7 +12,12 @@ import id.ac.ui.cs.advprog.bayarservice.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,5 +63,36 @@ public class PaymentServiceImpl implements Payment {
                 .invoice(invoice)
                 .build();
         return this.paymentRepository.save(paymentHistory);
+    }
+
+    @Override
+    public List<PaymentHistory> getPaymentLog() {
+        return this.paymentRepository.findAll();
+    }
+
+    @Override
+    public List<PaymentHistory> getPaymentLogByYearAndMonth(int year, int month) {
+        List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
+        return paymentHistories.stream()
+                .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year &&
+                        paymentHistory.getCreatedAt().toLocalDate().getMonthValue() == month)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PaymentHistory> getPaymentLogByYear(int year) {
+        List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
+        return paymentHistories.stream()
+                .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PaymentHistory> getPaymentLogByWeekAndYear(int year, int week) {
+        List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
+        return paymentHistories.stream()
+                .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year &&
+                        paymentHistory.getCreatedAt().toLocalDate().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()) == week)
+                .collect(Collectors.toList());
     }
 }

@@ -3,10 +3,13 @@ package id.ac.ui.cs.advprog.bayarservice.controller;
 import id.ac.ui.cs.advprog.bayarservice.Util;
 import id.ac.ui.cs.advprog.bayarservice.dto.coupon.CouponRequest;
 import id.ac.ui.cs.advprog.bayarservice.dto.coupon.UseCouponRequest;
+import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.coupon.Coupon;
 import id.ac.ui.cs.advprog.bayarservice.service.coupon.CouponServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,6 +22,8 @@ import java.util.UUID;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -92,5 +97,164 @@ public class CouponControllerTest {
                 .andExpect(handler().methodName("useCoupon"))
                 .andExpect(jsonPath("$.status").value("SUCCESS"))
                 .andDo(print());
+    }
+
+    @Test
+    void testCreateCouponShouldReturn200OK() throws Exception {
+        String requestURI = END_POINT_PATH + "coupons/createCoupon";
+
+        when(couponService.createCoupon(any(CouponRequest.class))).thenReturn(coupon);
+
+        String requestBody = Util.mapToJson(couponRequest);
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isCreated())
+                .andExpect(handler().methodName("createCoupon"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.content.name").value(coupon.getName()))
+                .andDo(print());
+
+        verify(couponService, atLeastOnce()).createCoupon(any(CouponRequest.class));
+    }
+
+    @Test
+    void testDeleteCouponShouldReturn200OK() throws Exception {
+        int couponId = 123;
+        String requestURI = END_POINT_PATH + "coupons/delete/" + couponId;
+
+        Coupon coupon = Coupon.builder()
+                .id(couponId)
+                .name("SEPTEMBERCERIA")
+                .discount(50000L)
+                .build();
+
+       String requestBody = Util.mapToJson(coupon);
+
+        mockMvc.perform(post(END_POINT_PATH + "coupons/createCoupon")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isCreated())
+                .andExpect(handler().methodName("createCoupon"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+
+        mockMvc.perform(delete(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("deleteCoupon"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+
+        verify(couponService, atLeastOnce()).deleteCoupon(any(Integer.class));
+    }
+
+    @Test
+    void testCreateCouponShouldReturn405NotAllowed() throws Exception {
+        String requestURI = END_POINT_PATH + "coupons/createCoupon";
+
+        when(couponService.createCoupon(any(CouponRequest.class))).thenReturn(coupon);
+
+        String requestBody = Util.mapToJson(couponRequest);
+
+        mockMvc.perform(get(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isMethodNotAllowed())
+                .andDo(print());
+
+        mockMvc.perform(delete(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isMethodNotAllowed())
+                .andDo(print());
+    }
+
+    @Test
+    void testDeleteCouponShouldReturn405NotAllowed() throws Exception {
+        int couponId = 123;
+        String requestURI = END_POINT_PATH + "coupons/delete/" + couponId;
+
+        Coupon coupon = Coupon.builder()
+                .id(couponId)
+                .name("SEPTEMBERCERIA")
+                .discount(50000L)
+                .build();
+
+       String requestBody = Util.mapToJson(coupon);
+
+        mockMvc.perform(get(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isMethodNotAllowed())
+                .andDo(print());
+
+        mockMvc.perform(put(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isMethodNotAllowed())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isMethodNotAllowed())
+                .andDo(print());
+    }
+
+    @Test
+    void testCreateCouponShouldReturn400BadRequest() throws Exception {
+        String requestURI = END_POINT_PATH + "coupons/createCoupon";
+        String requestBody = "";
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    @Test
+    void testCreateCouponShouldReturn409Conflict() throws Exception {
+        String requestURI = END_POINT_PATH + "coupons/createCoupon";
+
+        when(couponService.createCoupon(any(CouponRequest.class))).thenReturn(coupon);
+
+        String requestBody = Util.mapToJson(couponRequest);
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isCreated())
+                .andExpect(handler().methodName("createCoupon"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.content.name").value(coupon.getName()))
+                .andDo(print());
+
+        when(couponService.createCoupon(any(CouponRequest.class))).thenThrow(new CouponAlreadyExistException(couponRequest.getName()));
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isConflict())
+                .andDo(print());
+
+        verify(couponService, atLeastOnce()).createCoupon(any(CouponRequest.class));
+    }
+
+    @Test
+    void testDeleteCouponShouldReturn404NotFound() throws Exception {
+        int couponId = 123;
+        String requestURI = END_POINT_PATH + "coupons/delete/" + couponId;
+        Mockito.doThrow(new CouponDoesNotExistException(couponId)).when(couponService).deleteCoupon(any(Integer.class));
+
+        mockMvc.perform(delete(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+
+        verify(couponService, atLeastOnce()).deleteCoupon(any(Integer.class));
     }
 }
