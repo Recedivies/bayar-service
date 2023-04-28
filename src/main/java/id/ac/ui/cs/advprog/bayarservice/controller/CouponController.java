@@ -19,14 +19,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CouponController {
     private final CouponService couponService;
-//    create constant for success message
-    private static final String SUCCESS_MESSAGE = "SUCCESS";
 
     @PutMapping("/coupons/{couponId}")
     public ResponseEntity<Object> updateCoupon(@PathVariable Integer couponId, @RequestBody @Valid CouponRequest request) {
         Coupon coupon = couponService.update(couponId, request);
         return ResponseHandler.generateResponse(new Response(
-        "Success updated coupon", HttpStatus.OK, SUCCESS_MESSAGE, coupon)
+                "Success created invoice", HttpStatus.OK, "SUCCESS", coupon)
         );
     }
 
@@ -34,7 +32,7 @@ public class CouponController {
     public ResponseEntity<Object> useCoupon(@PathVariable UUID sessionId, @RequestBody @Valid UseCouponRequest request) {
         couponService.useCoupon(sessionId, request);
         return ResponseHandler.generateResponse(new Response(
-                "Success used coupon", HttpStatus.OK, SUCCESS_MESSAGE, null)
+                "Success Used Coupon", HttpStatus.OK, "SUCCESS", null)
         );
     }
 
@@ -42,7 +40,7 @@ public class CouponController {
     public ResponseEntity<Object> createCoupon(@RequestBody @Valid CouponRequest request) {
         Coupon coupon = couponService.createCoupon(request);
         return ResponseHandler.generateResponse(new Response(
-                "Success created coupon", HttpStatus.OK, SUCCESS_MESSAGE, coupon)
+                "Success created coupon", HttpStatus.CREATED, "SUCCESS", coupon)
         );
     }
 
@@ -50,7 +48,7 @@ public class CouponController {
     public ResponseEntity<Object> deleteCoupon(@PathVariable Integer couponId) {
         couponService.deleteCoupon(couponId);
         return ResponseHandler.generateResponse(new Response(
-                "Success deleted coupon", HttpStatus.OK, SUCCESS_MESSAGE, null)
+                "Success deleted coupon", HttpStatus.OK, "SUCCESS", null)
         );
     }
 }
