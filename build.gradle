@@ -15,7 +15,7 @@ sonarqube {
         property "sonar.branch.name", System.getenv("CI_COMMIT_BRANCH")
         property "sonar.scm.disabled", "true"
         property "sonar.coverage.exclusions", "**/**Application**, **/exceptions/**"
-        property "sonar.tests", "src/test/java"
+        property "sonar.exclusions", "src/test/java/**"
     }
 }
 
