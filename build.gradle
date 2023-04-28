@@ -56,6 +56,7 @@ tasks.jacocoTestReport {
         xml.required.set(false)
         csv.required.set(false)
         xml.enabled true
+        xml.destination file("${buildDir}/reports/jacoco/jacoco.xml")
         html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }
 }
