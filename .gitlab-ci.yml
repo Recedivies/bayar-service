@@ -103,3 +103,4 @@ Sonarcloud:
       - .sonar/cache
   script:
     - sonar-scanner
+    - sonar-scanner -Dsonar.coverage.jacoco.xmlReportPaths=/path/to/report
