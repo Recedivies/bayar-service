@@ -2,11 +2,14 @@ package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
 import id.ac.ui.cs.advprog.bayarservice.dto.Discount.DiscountRequest;
+import id.ac.ui.cs.advprog.bayarservice.service.discount.DiscountService;
+import id.ac.ui.cs.advprog.bayarservice.service.discount.DiscountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,6 +29,9 @@ public class DiscountControllerTest {
     private MockMvc mockMvc; // to mock http request
 
     DiscountRequest discountRequest;
+
+    @MockBean
+    DiscountServiceImpl discountService;
 
     @BeforeEach
     void setUp() {
