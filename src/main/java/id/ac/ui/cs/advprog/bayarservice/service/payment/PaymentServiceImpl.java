@@ -12,13 +12,10 @@ import id.ac.ui.cs.advprog.bayarservice.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.temporal.TemporalField;
+
 import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -44,7 +41,7 @@ public class PaymentServiceImpl implements Payment {
     public List<String> getPaymentMethods() {
         return Stream.of(PaymentMethod.values())
                                             .map(PaymentMethod::name)
-                                            .collect(Collectors.toList());
+                                            .toList();
     }
 
     @Override
@@ -76,7 +73,7 @@ public class PaymentServiceImpl implements Payment {
         return paymentHistories.stream()
                 .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year &&
                         paymentHistory.getCreatedAt().toLocalDate().getMonthValue() == month)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -84,7 +81,7 @@ public class PaymentServiceImpl implements Payment {
         List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
         return paymentHistories.stream()
                 .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -93,6 +90,6 @@ public class PaymentServiceImpl implements Payment {
         return paymentHistories.stream()
                 .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year &&
                         paymentHistory.getCreatedAt().toLocalDate().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()) == week)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
