@@ -53,10 +53,11 @@ tasks.jacocoTestReport {
     }
     dependsOn(tasks.test) // tests are required to run before generating the report
     reports {
-        xml.required.set(true)
-        csv.required.set(true)
         xml.enabled true
-        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+        html.enabled true
+        xml.destination = file(getBuildDir().toString() + File.separator.toString() + "jacoco" + File.separator.toString() + "coverage.xml")
+        csv.enabled false
+        html.destination = file(getBuildDir().toString() + File.separator.toString() + "jacoco" + File.separator.toString() + "html")
     }
 }
 
