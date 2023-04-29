@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DiscountRequest {
 
+    @NotNull(message = "discount type is mandatory")
+    private String discountType;
+
     @Min(0)
     @NotNull(message = "discount is mandatory")
     private Long discount;

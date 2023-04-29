@@ -29,7 +29,8 @@ public class DiscountServiceTest {
     private InvoiceRepository invoiceRepository;
 
     Invoice invoice;
-    DiscountRequest discountRequest;
+    DiscountRequest nominalDiscountRequest;
+    DiscountRequest percentageDiscountRequest;
 
     @BeforeEach
     void setUp() {
@@ -38,22 +39,28 @@ public class DiscountServiceTest {
                 .discount(5000L)
                 .build();
 
-        discountRequest = DiscountRequest.builder()
+        nominalDiscountRequest = DiscountRequest.builder()
+                .discountType("Nominal")
                 .discount(50000L)
+                .build();
+
+        percentageDiscountRequest = DiscountRequest.builder()
+                .discountType("Percentage")
+                .discount(50L)
                 .build();
 
     }
 
     @Test
-    void whenGiveDiscountShouldUpdateInvoiceDiscount() {
+    void whenGiveNominalDiscountShouldUpdateInvoiceDiscount() {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
 
-        discountService.giveDiscount(UUID.randomUUID(), discountRequest);
+        discountService.giveDiscount(UUID.randomUUID(), nominalDiscountRequest);
         verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
     }
 
     @Test
-    void whenUseCouponAndDiscountGreaterThanInvoiceTotalAmount() {
+    void whenGiveNominalDiscountAndDiscountGreaterThanInvoiceTotalAmount() {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
 
         when(invoiceRepository.save(any(Invoice.class))).thenAnswer(invocation -> {
@@ -62,16 +69,46 @@ public class DiscountServiceTest {
             return invoice;
         });
 
-        discountService.giveDiscount(UUID.randomUUID(), discountRequest);
+        discountService.giveDiscount(UUID.randomUUID(), nominalDiscountRequest);
         verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
         Assertions.assertEquals(0L, invoice.getTotalAmount());
     }
 
     @Test
-    void whenUseCouponAndInvoiceNotFoundThrowException() {
+    void whenGiveNominalDiscountAndInvoiceNotFoundThrowException() {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.empty());
         Assertions.assertThrows(InvoiceDoesNotExistException.class,
-                () -> discountService.giveDiscount(UUID.randomUUID(), discountRequest));
+                () -> discountService.giveDiscount(UUID.randomUUID(), nominalDiscountRequest));
+    }
+
+    @Test
+    void whenGivePercentageDiscountShouldUpdateInvoiceDiscount() {
+        when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
+
+        discountService.giveDiscount(UUID.randomUUID(), percentageDiscountRequest);
+        verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
+    }
+
+    @Test
+    void whenGivePercentageDiscountAndDiscountGreaterThanInvoiceTotalAmount() {
+        when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
+
+        when(invoiceRepository.save(any(Invoice.class))).thenAnswer(invocation -> {
+            var invoice = invocation.getArgument(0, Invoice.class);
+            invoice.setTotalAmount(0L);
+            return invoice;
+        });
+
+        discountService.giveDiscount(UUID.randomUUID(), percentageDiscountRequest);
+        verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
+        Assertions.assertEquals(0L, invoice.getTotalAmount());
+    }
+
+    @Test
+    void whenGivePercentageDiscountAndInvoiceNotFoundThrowException() {
+        when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.empty());
+        Assertions.assertThrows(InvoiceDoesNotExistException.class,
+                () -> discountService.giveDiscount(UUID.randomUUID(), percentageDiscountRequest));
     }
 
 }

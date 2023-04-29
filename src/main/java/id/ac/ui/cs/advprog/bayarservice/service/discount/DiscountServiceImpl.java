@@ -22,17 +22,32 @@ public class DiscountServiceImpl implements  DiscountService {
         Invoice invoice = this.invoiceRepository.findBySessionId(sessionId)
                 .orElseThrow(() -> new InvoiceDoesNotExistException(sessionId));
 
-        handleInvoiceDiscount(invoice, request.getDiscount());
+        if (request.getDiscountType().equals("Nominal")) {
+            handleInvoiceNominalDiscount(invoice, request.getDiscount());
+        }
+        else if(request.getDiscountType().equals("Percentage")) {
+            handleInvoicePercentageDiscount(invoice, request.getDiscount());
+        }
 
         this.invoiceRepository.save(invoice);
     }
 
-    private void handleInvoiceDiscount(Invoice invoice, long discount) {
+    private void handleInvoiceNominalDiscount(Invoice invoice, long discount) {
         invoice.setDiscount(invoice.getDiscount() + discount);
         if (invoice.getTotalAmount() - discount < 0) {
             invoice.setTotalAmount(0L);
         } else {
             invoice.setTotalAmount(invoice.getTotalAmount() - discount);
+        }
+    }
+
+    private void handleInvoicePercentageDiscount(Invoice invoice, long discount) {
+        long newDiscount = (invoice.getTotalAmount()/100) * discount;
+        invoice.setDiscount(invoice.getDiscount() + newDiscount);
+        if (invoice.getTotalAmount() - newDiscount < 0) {
+            invoice.setTotalAmount(0L);
+        } else {
+            invoice.setTotalAmount(invoice.getTotalAmount() - newDiscount);
         }
     }
 }

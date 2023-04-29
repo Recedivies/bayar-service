@@ -28,28 +28,50 @@ public class DiscountControllerTest {
     @Autowired
     private MockMvc mockMvc; // to mock http request
 
-    DiscountRequest discountRequest;
-
+    DiscountRequest nominalDiscountRequest;
+    DiscountRequest percentageDiscountRequest;
     @MockBean
     DiscountServiceImpl discountService;
 
     @BeforeEach
     void setUp() {
-        discountRequest = DiscountRequest.builder()
+        nominalDiscountRequest = DiscountRequest.builder()
+                .discountType("Nominal")
                 .discount(50000L)
+                .build();
+
+        percentageDiscountRequest = DiscountRequest.builder()
+                .discountType("Percentage")
+                .discount(50L)
                 .build();
     }
 
     @Test
-    void testGiveDiscount() throws Exception {
+    void testGiveNominalDiscount() throws Exception {
         UUID sessionId = UUID.randomUUID();
         String requestURI = END_POINT_PATH + "sessions/" + sessionId + "/discount";
 
-        String requestBody = Util.mapToJson(discountRequest);
+        String requestBody = Util.mapToJson(nominalDiscountRequest);
 
         mockMvc.perform(post(requestURI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("giveDiscount"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+    }
+
+    @Test
+    void testGivePercentageDiscount() throws Exception {
+        UUID sessionId = UUID.randomUUID();
+        String requestURI = END_POINT_PATH + "sessions/" + sessionId + "/discount";
+
+        String requestBody = Util.mapToJson(percentageDiscountRequest);
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(handler().methodName("giveDiscount"))
                 .andExpect(jsonPath("$.status").value("SUCCESS"))
