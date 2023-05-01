@@ -12,8 +12,10 @@ import id.ac.ui.cs.advprog.bayarservice.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+import java.time.temporal.WeekFields;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 @Service
@@ -39,7 +41,7 @@ public class PaymentServiceImpl implements Payment {
     public List<String> getPaymentMethods() {
         return Stream.of(PaymentMethod.values())
                                             .map(PaymentMethod::name)
-                                            .collect(Collectors.toList());
+                                            .toList();
     }
 
     @Override
@@ -58,5 +60,36 @@ public class PaymentServiceImpl implements Payment {
                 .invoice(invoice)
                 .build();
         return this.paymentRepository.save(paymentHistory);
+    }
+
+    @Override
+    public List<PaymentHistory> getPaymentLog() {
+        return this.paymentRepository.findAll();
+    }
+
+    @Override
+    public List<PaymentHistory> getPaymentLogByYearAndMonth(int year, int month) {
+        List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
+        return paymentHistories.stream()
+                .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year &&
+                        paymentHistory.getCreatedAt().toLocalDate().getMonthValue() == month)
+                .toList();
+    }
+
+    @Override
+    public List<PaymentHistory> getPaymentLogByYear(int year) {
+        List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
+        return paymentHistories.stream()
+                .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year)
+                .toList();
+    }
+
+    @Override
+    public List<PaymentHistory> getPaymentLogByWeekAndYear(int year, int week) {
+        List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
+        return paymentHistories.stream()
+                .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year &&
+                        paymentHistory.getCreatedAt().toLocalDate().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()) == week)
+                .toList();
     }
 }

@@ -162,4 +162,35 @@ public class CouponServiceTest {
         Assertions.assertThrows(CouponDoesNotExistException.class,
                 () -> couponService.useCoupon(UUID.randomUUID(), useCouponRequest));
     }
+
+    @Test
+    void whenCreateCouponAndCouponNameAlreadyExistShouldThrowException() {
+        when(couponRepository.findByName(any(String.class))).thenReturn(Optional.of(coupon));
+        Assertions.assertThrows(CouponAlreadyExistException.class,
+                () -> couponService.createCoupon(updateRequest));
+    }
+
+    @Test
+    void whenCreateCouponAndCouponNameDoesNotExistShouldReturnCreatedCoupon() {
+        when(couponRepository.findByName(any(String.class))).thenReturn(Optional.empty());
+        when(couponRepository.save(any(Coupon.class))).thenAnswer(invocation ->
+                invocation.getArgument(0, Coupon.class));
+
+        Coupon result = couponService.createCoupon(updateRequest);
+        verify(couponRepository, atLeastOnce()).save(any(Coupon.class));
+        Assertions.assertEquals(newCoupon, result);
+    }
+
+    @Test
+    void whenDeleteCouponAndFoundByIdShouldDeleteCoupon() {
+        when(couponRepository.findById(any(Integer.class))).thenReturn(Optional.of(coupon));
+        couponService.deleteCoupon(1);
+        verify(couponRepository, atLeastOnce()).deleteById(any(Integer.class));
+    }
+
+    @Test
+    void whenDeleteCouponAndNotFoundByIdShouldThrowException() {
+        when(couponRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
+        Assertions.assertThrows(CouponDoesNotExistException.class, () -> couponService.deleteCoupon(1));
+    }
 }

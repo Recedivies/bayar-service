@@ -26,7 +26,6 @@ public class BankPaymentTest {
     @BeforeEach
     void setUp() {
         bank = Bank.builder()
-                .id(1)
                 .name("BNI")
                 .adminFee(5000)
                 .build();

@@ -3,6 +3,7 @@ package id.ac.ui.cs.advprog.bayarservice.service.bill;
 import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.dto.Bill.BillRequest;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
+import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.repository.BillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,13 +23,16 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill create(BillRequest request) {
+        Invoice invoice = invoiceService.findById(request.getInvoiceId());
         Bill bill = Bill.builder()
                 .name(request.getName())
                 .price(request.getPrice())
                 .quantity(request.getQuantity())
                 .subTotal(request.getSubTotal())
-                .invoice(invoiceService.findById(request.getInvoiceId()))
+                .invoice(invoice)
                 .build();
+        Integer toBeAdded = bill.getSubTotal().intValue();
+        invoice.setTotalAmount(invoice.getTotalAmount() + toBeAdded);
         return billRepository.save(bill);
     }
 

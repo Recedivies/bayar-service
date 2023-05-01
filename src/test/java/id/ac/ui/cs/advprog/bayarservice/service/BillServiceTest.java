@@ -5,6 +5,7 @@ import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.repository.BillRepository;
+import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import id.ac.ui.cs.advprog.bayarservice.service.bill.BillServiceImpl;
 import id.ac.ui.cs.advprog.bayarservice.service.invoice.InvoiceServiceImpl;
 import org.junit.jupiter.api.Assertions;
@@ -47,6 +48,7 @@ public class BillServiceTest {
 
         invoice = Invoice.builder()
                 .id(1)
+                .totalAmount(50000L)
                 .build();
     }
 
@@ -86,6 +88,7 @@ public class BillServiceTest {
 
     @Test
     void whenCreateBillShouldReturnBill() {
+        when(invoiceService.findById(any(Integer.class))).thenReturn(invoice);
         when(billRepository.save(any(Bill.class))).thenReturn(bill);
         BillRequest billRequest = new BillRequest("Coffee", 5, 10000, 50000L, 1);
         Bill result = billService.create(billRequest);

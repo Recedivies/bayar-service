@@ -41,7 +41,6 @@ public class BillRepositoryTest {
         invoiceRepository.save(invoice);
 
         bill = Bill.builder()
-                .id(1)
                 .name("Coffee")
                 .quantity(5)
                 .price(10000)
