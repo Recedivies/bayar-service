@@ -1,7 +1,8 @@
 package id.ac.ui.cs.advprog.bayarservice.service;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
-import id.ac.ui.cs.advprog.bayarservice.exception.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
@@ -37,14 +38,12 @@ public class InvoiceServiceTest {
     Bill newBill;
     InvoiceRequest createRequest;
     InvoiceRequest updateRequest;
+    UUID uuid = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
         createRequest = InvoiceRequest.builder()
-                .paymentMethod(String.valueOf(PaymentMethod.CASH))
-                .totalAmount(100000L)
-                .adminFee(5000)
-                .discount(5000L)
+                .sessionId(uuid)
                 .build();
 
         updateRequest = InvoiceRequest.builder()
@@ -56,11 +55,8 @@ public class InvoiceServiceTest {
 
         invoice = Invoice.builder()
                 .id(1)
-                .paymentMethod(PaymentMethod.CASH)
+                .sessionId(uuid)
                 .paymentStatus(PaymentStatus.UNPAID)
-                .totalAmount(100000L)
-                .adminFee(5000)
-                .discount(5000L)
                 .build();
 
         newInvoice = Invoice.builder()
@@ -98,6 +94,14 @@ public class InvoiceServiceTest {
 
         verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
         Assertions.assertEquals(invoice, result);
+    }
+
+    @Test
+    void whenCreateInvoiceAndAlreadyExistShouldThrowException() {
+        when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
+
+        Assertions.assertThrows(InvoiceAlreadyExistException.class,
+                () -> invoiceService.create(createRequest));
     }
 
     @Test

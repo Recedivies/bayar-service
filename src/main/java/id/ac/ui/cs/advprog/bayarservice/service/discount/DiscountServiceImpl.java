@@ -1,7 +1,7 @@
 package id.ac.ui.cs.advprog.bayarservice.service.discount;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.Discount.DiscountRequest;
-import id.ac.ui.cs.advprog.bayarservice.exception.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import org.springframework.stereotype.Service;
