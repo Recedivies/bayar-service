@@ -23,7 +23,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill create(BillRequest request) {
-        Invoice invoice = invoiceService.findById(request.getInvoiceId());
+        Invoice invoice = invoiceService.findBySessionId(request.getSessionId());
         Bill bill = Bill.builder()
                 .name(request.getName())
                 .price(request.getPrice())
@@ -31,6 +31,7 @@ public class BillServiceImpl implements BillService {
                 .subTotal(request.getSubTotal())
                 .invoice(invoice)
                 .build();
+        System.out.println(request);
         Integer toBeAdded = bill.getSubTotal().intValue();
         invoice.setTotalAmount(invoice.getTotalAmount() + toBeAdded);
         return billRepository.save(bill);
@@ -55,7 +56,6 @@ public class BillServiceImpl implements BillService {
             bill.setPrice(request.getPrice());
             bill.setQuantity(request.getQuantity());
             bill.setSubTotal(request.getSubTotal());
-            bill.setInvoice(invoiceService.findById(request.getInvoiceId()));
             return this.billRepository.save(bill);
         }
     }

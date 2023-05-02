@@ -24,7 +24,6 @@ public class InvoiceRequest {
     private Integer adminFee;
 
     @Min(0)
-    @NotNull(message = "totalAmount is mandatory")
     private Long totalAmount;
 
     @Min(0)
