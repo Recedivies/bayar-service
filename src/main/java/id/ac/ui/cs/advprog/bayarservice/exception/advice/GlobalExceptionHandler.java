@@ -4,6 +4,9 @@ import id.ac.ui.cs.advprog.bayarservice.exception.*;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyUsedException;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvalidPaymentMethodException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.util.Response;
 import id.ac.ui.cs.advprog.bayarservice.util.ResponseHandler;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -75,6 +78,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = {
             BankAlreadyExistsException.class,
             CouponAlreadyExistException.class,
+            InvoiceAlreadyExistException.class
     })
     public ResponseEntity<Object> alreadyExistResourceException(Exception exception) {
         return ResponseHandler.generateResponse(new Response(

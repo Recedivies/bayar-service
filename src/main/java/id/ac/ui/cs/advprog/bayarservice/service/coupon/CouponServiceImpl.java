@@ -5,7 +5,7 @@ import id.ac.ui.cs.advprog.bayarservice.dto.coupon.UseCouponRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyUsedException;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponDoesNotExistException;
-import id.ac.ui.cs.advprog.bayarservice.exception.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.coupon.Coupon;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.repository.CouponRepository;
