@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -14,5 +17,5 @@ public class BillRequest {
     private Integer price;
     private Integer quantity;
     private Long subTotal;
-    private Integer invoiceId;
+    private UUID sessionId;
 }

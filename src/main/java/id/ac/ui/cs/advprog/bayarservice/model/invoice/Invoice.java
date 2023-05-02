@@ -43,8 +43,8 @@ public class Invoice {
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE default CURRENT_TIMESTAMP")
     private Date createdAt;
 
-    @Column(nullable = false)
-    private Long totalAmount;
+    @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    private Long totalAmount = 0L;
 
     @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer adminFee = 0;
