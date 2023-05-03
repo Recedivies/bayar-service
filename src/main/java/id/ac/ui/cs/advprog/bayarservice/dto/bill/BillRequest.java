@@ -1,4 +1,4 @@
-package id.ac.ui.cs.advprog.bayarservice.dto.Bill;
+package id.ac.ui.cs.advprog.bayarservice.dto.bill;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

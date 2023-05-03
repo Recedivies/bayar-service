@@ -19,12 +19,15 @@ import java.util.List;
 public class PaymentController {
 
     private final PaymentServiceImpl paymentService;
+    private static final String SUCCESS = "SUCCESS";
+    private static final String RETRIEVED = "Success retrieved data";
+
 
     @GetMapping("/methods")
     public ResponseEntity<Object> getPaymentMethods() {
         List<String> response = paymentService.getPaymentMethods();
         return ResponseHandler.generateResponse(new Response(
-                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+                RETRIEVED, HttpStatus.OK, SUCCESS, response)
         );
     }
 
@@ -32,7 +35,7 @@ public class PaymentController {
     public ResponseEntity<Object> createPayment(@PathVariable Integer invoiceId, @RequestBody @Valid PaymentRequest request) {
         PaymentHistory paymentHistory = paymentService.create(invoiceId, request);
         return ResponseHandler.generateResponse(new Response(
-                "Payment processed successfully!", HttpStatus.CREATED, "SUCCESS", paymentHistory)
+                "Payment processed successfully!", HttpStatus.CREATED, SUCCESS, paymentHistory)
         );
     }
 
@@ -40,7 +43,7 @@ public class PaymentController {
     public ResponseEntity<Object> getPaymentLog() {
         List<PaymentHistory> response = paymentService.getPaymentLog();
         return ResponseHandler.generateResponse(new Response(
-                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+                RETRIEVED, HttpStatus.OK, SUCCESS, response)
         );
     }
 
@@ -48,7 +51,7 @@ public class PaymentController {
     public ResponseEntity<Object> getPaymentLogByYearAndMonth(@PathVariable Integer year, @PathVariable Integer month) {
         List<PaymentHistory> response = paymentService.getPaymentLogByYearAndMonth(year, month);
         return ResponseHandler.generateResponse(new Response(
-                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+                RETRIEVED, HttpStatus.OK, SUCCESS, response)
         );
     }
 
@@ -56,7 +59,7 @@ public class PaymentController {
     public ResponseEntity<Object> getPaymentLogByYear(@PathVariable Integer year) {
         List<PaymentHistory> response = paymentService.getPaymentLogByYear(year);
         return ResponseHandler.generateResponse(new Response(
-                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+                RETRIEVED, HttpStatus.OK, SUCCESS, response)
         );
     }
 
@@ -64,7 +67,7 @@ public class PaymentController {
     public ResponseEntity<Object> getPaymentLogByWeekAndYear(@PathVariable Integer year, @PathVariable Integer week) {
         List<PaymentHistory> response = paymentService.getPaymentLogByWeekAndYear(year, week);
         return ResponseHandler.generateResponse(new Response(
-                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+                RETRIEVED, HttpStatus.OK, SUCCESS, response)
         );
     }
 }

@@ -20,10 +20,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final String FAILED = "Failed";
 
     @ExceptionHandler(value = {
             BillDoesNotExistException.class,
@@ -33,7 +34,7 @@ public class GlobalExceptionHandler {
     })
     public ResponseEntity<Object> notAvailableHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
-                exception.getMessage(), HttpStatus.NOT_FOUND, "FAILED", null)
+                exception.getMessage(), HttpStatus.NOT_FOUND, FAILED, null)
         );
     }
 
@@ -45,14 +46,14 @@ public class GlobalExceptionHandler {
     })
     public ResponseEntity<Object> badRequestHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
-                exception.getMessage(), HttpStatus.BAD_REQUEST, "FAILED", null)
+                exception.getMessage(), HttpStatus.BAD_REQUEST, FAILED, null)
         );
     }
 
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Object> methodNotAllowed(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
-                exception.getMessage(), HttpStatus.METHOD_NOT_ALLOWED, "FAILED", null)
+                exception.getMessage(), HttpStatus.METHOD_NOT_ALLOWED, FAILED, null)
         );
     }
 
@@ -61,17 +62,17 @@ public class GlobalExceptionHandler {
         List<String> errors = exception.getBindingResult().getFieldErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.toList());
+                .toList();
 
         return ResponseHandler.generateResponse(new Response(
-                "validation error", HttpStatus.BAD_REQUEST, "FAILED", errors)
+                "validation error", HttpStatus.BAD_REQUEST, FAILED, errors)
         );
     }
 
     @ExceptionHandler(value = {Exception.class})
     public ResponseEntity<Object> generalError(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
-                exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "FAILED", null)
+                exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, FAILED, null)
         );
     }
 
@@ -82,7 +83,7 @@ public class GlobalExceptionHandler {
     })
     public ResponseEntity<Object> alreadyExistResourceException(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
-                exception.getMessage(), HttpStatus.CONFLICT, "FAILED", null)
+                exception.getMessage(), HttpStatus.CONFLICT, FAILED, null)
         );
     }
 }
