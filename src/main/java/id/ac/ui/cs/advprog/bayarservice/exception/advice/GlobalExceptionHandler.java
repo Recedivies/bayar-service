@@ -24,7 +24,7 @@ import java.util.List;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final String FAILED = "Failed";
+    private static final String FAILED = "FAILED";
 
     @ExceptionHandler(value = {
             BillDoesNotExistException.class,
