@@ -1,6 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
-import id.ac.ui.cs.advprog.bayarservice.dto.Bill.BillRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.bill.BillRequest;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.service.bill.BillService;
 import id.ac.ui.cs.advprog.bayarservice.util.Response;
@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.*;
 public class BillController {
     private final BillService billService;
 
-    @GetMapping("/bills/{bill_id}")
-    public ResponseEntity<Object> getBillById(@PathVariable Integer bill_id) {
-        Bill bill = billService.findById(bill_id);
+    @GetMapping("/bills/{billId}")
+    public ResponseEntity<Object> getBillById(@PathVariable Integer billId) {
+        Bill bill = billService.findById(billId);
         return ResponseHandler.generateResponse(new Response(
                 "Success retrieved data", HttpStatus.OK, "SUCCESS", bill)
         );
@@ -33,22 +33,22 @@ public class BillController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/bills/delete/{bill_id}")
-    public ResponseEntity<String> deleteBillById(@PathVariable Integer bill_id) {
-        if (billService.findById(bill_id) == null) {
+    @DeleteMapping("/bills/delete/{billId}")
+    public ResponseEntity<String> deleteBillById(@PathVariable Integer billId) {
+        if (billService.findById(billId) == null) {
             return ResponseEntity.notFound().build();
         }
-        billService.delete(bill_id);
-        return ResponseEntity.ok(String.format("Deleted Bill with id %d", bill_id));
+        billService.delete(billId);
+        return ResponseEntity.ok(String.format("Deleted Bill with id %d", billId));
     }
 
-    @PutMapping("/bills/update/{bill_id}")
-    public ResponseEntity<Bill> updateBillById(@PathVariable Integer bill_id, @RequestBody BillRequest request) {
-        if (billService.findById(bill_id) == null) {
+    @PutMapping("/bills/update/{billId}")
+    public ResponseEntity<Bill> updateBillById(@PathVariable Integer billId, @RequestBody BillRequest request) {
+        if (billService.findById(billId) == null) {
             return ResponseEntity.notFound().build();
         }
-        Bill updatedBill = billService.update(bill_id, request);
-        if (billService.findById(bill_id) == null) {
+        Bill updatedBill = billService.update(billId, request);
+        if (billService.findById(billId) == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(updatedBill);

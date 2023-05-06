@@ -1,7 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.service.discount;
 
-import id.ac.ui.cs.advprog.bayarservice.dto.Discount.DiscountRequest;
-import id.ac.ui.cs.advprog.bayarservice.model.coupon.Coupon;
+import id.ac.ui.cs.advprog.bayarservice.dto.discount.DiscountRequest;
 
 import java.util.UUID;
 

@@ -2,7 +2,7 @@ package id.ac.ui.cs.advprog.bayarservice.service.bank;
 
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import org.springframework.stereotype.Service;
-import id.ac.ui.cs.advprog.bayarservice.dto.Bank.BankRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.bank.BankRequest;
 
 import java.util.List;
 

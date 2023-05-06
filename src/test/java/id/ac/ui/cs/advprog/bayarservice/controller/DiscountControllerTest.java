@@ -1,8 +1,7 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
-import id.ac.ui.cs.advprog.bayarservice.dto.Discount.DiscountRequest;
-import id.ac.ui.cs.advprog.bayarservice.service.discount.DiscountService;
+import id.ac.ui.cs.advprog.bayarservice.dto.discount.DiscountRequest;
 import id.ac.ui.cs.advprog.bayarservice.service.discount.DiscountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

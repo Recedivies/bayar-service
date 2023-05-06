@@ -1,6 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.service;
 
-import id.ac.ui.cs.advprog.bayarservice.dto.Discount.DiscountRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.discount.DiscountRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;

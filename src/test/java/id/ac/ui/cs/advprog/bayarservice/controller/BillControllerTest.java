@@ -1,7 +1,7 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
-import id.ac.ui.cs.advprog.bayarservice.dto.Bill.BillRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.bill.BillRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
