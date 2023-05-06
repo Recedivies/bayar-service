@@ -1,6 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
-import id.ac.ui.cs.advprog.bayarservice.dto.Discount.DiscountRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.discount.DiscountRequest;
 import id.ac.ui.cs.advprog.bayarservice.service.discount.DiscountService;
 import id.ac.ui.cs.advprog.bayarservice.util.Response;
 import id.ac.ui.cs.advprog.bayarservice.util.ResponseHandler;

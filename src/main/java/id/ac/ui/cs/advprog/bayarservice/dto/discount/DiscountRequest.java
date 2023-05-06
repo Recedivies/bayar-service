@@ -1,4 +1,4 @@
-package id.ac.ui.cs.advprog.bayarservice.dto.Discount;
+package id.ac.ui.cs.advprog.bayarservice.dto.discount;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

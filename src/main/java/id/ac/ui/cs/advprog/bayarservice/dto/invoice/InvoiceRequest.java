@@ -1,4 +1,4 @@
-package id.ac.ui.cs.advprog.bayarservice.dto.Invoice;
+package id.ac.ui.cs.advprog.bayarservice.dto.invoice;
 
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;

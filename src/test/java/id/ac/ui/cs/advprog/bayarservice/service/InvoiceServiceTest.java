@@ -1,6 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.service;
 
-import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.invoice.InvoiceRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;

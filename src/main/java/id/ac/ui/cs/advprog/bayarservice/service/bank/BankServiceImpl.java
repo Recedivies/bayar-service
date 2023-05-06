@@ -2,7 +2,7 @@ package id.ac.ui.cs.advprog.bayarservice.service.bank;
 
 import id.ac.ui.cs.advprog.bayarservice.exception.BankAlreadyExistsException;
 import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
-import id.ac.ui.cs.advprog.bayarservice.dto.Bank.BankRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.bank.BankRequest;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.repository.BankRepository;
 import lombok.RequiredArgsConstructor;
