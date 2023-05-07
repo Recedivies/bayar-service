@@ -5,6 +5,7 @@ import id.ac.ui.cs.advprog.bayarservice.dto.bill.BillRequest;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.repository.BillRepository;
+import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import id.ac.ui.cs.advprog.bayarservice.service.invoice.InvoiceService;
@@ -13,6 +14,7 @@ import id.ac.ui.cs.advprog.bayarservice.service.invoice.InvoiceService;
 @RequiredArgsConstructor
 public class BillServiceImpl implements BillService {
     private final BillRepository billRepository;
+
     private final InvoiceService invoiceService;
 
     @Override
@@ -47,21 +49,24 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill update(Integer id, BillRequest request) {
-        if (isBillDoesNotExist(id)) {
-            throw new BillDoesNotExistException(id);
-        } else {
-            Bill bill = billRepository.findById(id).orElseThrow();
-            bill.setName(request.getName());
-            bill.setPrice(request.getPrice());
-            bill.setQuantity(request.getQuantity());
-            bill.setSubTotal(request.getSubTotal());
+        Invoice invoice = this.invoiceService.findBySessionId(request.getSessionId());
+        Bill bill = this.billRepository.findById(id)
+                .orElseThrow(() -> new BillDoesNotExistException(id));
+//        if (isBillDoesNotExist(id)) {
+//            throw new BillDoesNotExistException(id);
+//        } else {
+//            Bill bill = billRepository.findById(id).orElseThrow();
+        bill.setName(request.getName());
+        bill.setPrice(request.getPrice());
+        bill.setQuantity(request.getQuantity());
+        bill.setSubTotal(request.getSubTotal());
 //            find invoice that has this bill
-            Invoice invoice = invoiceService.findBySessionId(request.getSessionId());
-            int toBeAdded = bill.getSubTotal().intValue();
-            Integer toBeSubtracted = billRepository.findById(id).orElseThrow().getSubTotal().intValue();
-            invoice.setTotalAmount(invoice.getTotalAmount() - toBeSubtracted + toBeAdded);
-            return this.billRepository.save(bill);
-        }
+//        Invoice invoice = invoiceService.findBySessionId(request.getSessionId());
+        int toBeAdded = bill.getSubTotal().intValue();
+        Integer toBeSubtracted = billRepository.findById(id).orElseThrow().getSubTotal().intValue();
+        invoice.setTotalAmount(invoice.getTotalAmount() - toBeSubtracted + toBeAdded);
+        return this.billRepository.save(bill);
+//        }
     }
 
     private boolean isBillDoesNotExist(Integer id) {

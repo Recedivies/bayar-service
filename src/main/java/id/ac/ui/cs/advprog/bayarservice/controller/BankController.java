@@ -37,9 +37,6 @@ public class BankController {
 
     @DeleteMapping("/banks/delete/{bankId}")
     public ResponseEntity<String> deleteBankById(@PathVariable Integer bankId) {
-        if (bankService.findById(bankId) == null) {
-            return ResponseEntity.notFound().build();
-        }
         bankService.deleteById(bankId);
         return ResponseEntity.ok(String.format("Deleted Bank with id %d", bankId));
     }
@@ -47,9 +44,6 @@ public class BankController {
     @PutMapping("banks/update/{bankId}")
     public ResponseEntity<Bank> updateBankById(@PathVariable Integer bankId, @RequestBody BankRequest request) {
         Bank bank = bankService.update(bankId, request);
-        if (bank == null) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(bank);
     }
 }
