@@ -2,16 +2,17 @@ package id.ac.ui.cs.advprog.bayarservice.service.payment;
 
 import id.ac.ui.cs.advprog.bayarservice.core.*;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyPaidException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentStatus;
-import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentHistory;
+import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentLog;
 import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import id.ac.ui.cs.advprog.bayarservice.repository.PaymentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import id.ac.ui.cs.advprog.bayarservice.rest.WarnetService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 
 import java.time.temporal.WeekFields;
 import java.util.List;
@@ -19,24 +20,15 @@ import java.util.Locale;
 import java.util.stream.Stream;
 
 @Service
-public class PaymentServiceImpl implements Payment {
-
+@RequiredArgsConstructor
+public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
 
     private final InvoiceRepository invoiceRepository;
 
     private final PaymentReceiver paymentReceiver;
 
-    @Autowired
-    public PaymentServiceImpl(
-                              PaymentRepository paymentRepository,
-                              InvoiceRepository invoiceRepository,
-                              PaymentReceiver paymentReceiver
-    ) {
-        this.paymentRepository = paymentRepository;
-        this.invoiceRepository = invoiceRepository;
-        this.paymentReceiver = paymentReceiver;
-    }
+    private final WarnetService warnetService;
 
     public List<String> getPaymentMethods() {
         return Stream.of(PaymentMethod.values())
@@ -45,31 +37,36 @@ public class PaymentServiceImpl implements Payment {
     }
 
     @Override
-    public PaymentHistory create(Integer invoiceId, PaymentRequest request) {
+    public PaymentLog create(Integer invoiceId, PaymentRequest request) {
         Invoice invoice = this.invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new InvoiceDoesNotExistException(invoiceId));
+        if (invoice.getPaymentStatus().equals(PaymentStatus.PAID)) {
+            throw new InvoiceAlreadyPaidException(request.getSessionId());
+        }
 
+        var session = this.warnetService.getSessionViaAPI(request.getSessionId());
+        var noPC = session.getPc().getNoPC();
         long totalAmount = paymentReceiver.receive(request);
-
         invoice.setPaymentStatus(PaymentStatus.PAID);
         invoice.setPaymentMethod(PaymentMethod.valueOf(request.getPaymentMethod()));
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
+        PaymentLog paymentLog = PaymentLog.builder()
                 .sessionId(request.getSessionId())
+                .noPC(noPC)
                 .totalAmount(totalAmount)
                 .invoice(invoice)
                 .build();
-        return this.paymentRepository.save(paymentHistory);
+        return this.paymentRepository.save(paymentLog);
     }
 
     @Override
-    public List<PaymentHistory> getPaymentLog() {
+    public List<PaymentLog> getPaymentLog() {
         return this.paymentRepository.findAll();
     }
 
     @Override
-    public List<PaymentHistory> getPaymentLogByYearAndMonth(int year, int month) {
-        List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
+    public List<PaymentLog> getPaymentLogByYearAndMonth(int year, int month) {
+        List<PaymentLog> paymentHistories = this.paymentRepository.findAll();
         return paymentHistories.stream()
                 .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year &&
                         paymentHistory.getCreatedAt().toLocalDate().getMonthValue() == month)
@@ -77,16 +74,16 @@ public class PaymentServiceImpl implements Payment {
     }
 
     @Override
-    public List<PaymentHistory> getPaymentLogByYear(int year) {
-        List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
+    public List<PaymentLog> getPaymentLogByYear(int year) {
+        List<PaymentLog> paymentHistories = this.paymentRepository.findAll();
         return paymentHistories.stream()
                 .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year)
                 .toList();
     }
 
     @Override
-    public List<PaymentHistory> getPaymentLogByWeekAndYear(int year, int week) {
-        List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
+    public List<PaymentLog> getPaymentLogByWeekAndYear(int year, int week) {
+        List<PaymentLog> paymentHistories = this.paymentRepository.findAll();
         return paymentHistories.stream()
                 .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year &&
                         paymentHistory.getCreatedAt().toLocalDate().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()) == week)

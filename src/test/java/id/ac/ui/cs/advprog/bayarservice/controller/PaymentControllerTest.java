@@ -4,7 +4,7 @@ import id.ac.ui.cs.advprog.bayarservice.Util;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
-import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentHistory;
+import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentLog;
 import id.ac.ui.cs.advprog.bayarservice.service.payment.PaymentServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,13 +69,13 @@ class PaymentControllerTest {
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
                 .build();
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
+        PaymentLog paymentLog = PaymentLog.builder()
                 .totalAmount(100000L)
                 .sessionId(UUID.randomUUID())
                 .invoice(invoice)
                 .build();
 
-        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentLog);
 
         String requestBody = Util.mapToJson(paymentRequest);
 
@@ -95,8 +95,8 @@ class PaymentControllerTest {
         int invoiceId = 123;
         String requestURI = END_POINT_PATH + "/invoices/" + invoiceId + "/payments";
 
-        PaymentHistory paymentHistory = PaymentHistory.builder().build();
-        String requestBody = Util.mapToJson(paymentHistory);
+        PaymentLog paymentLog = PaymentLog.builder().build();
+        String requestBody = Util.mapToJson(paymentLog);
 
         mockMvc.perform(post(requestURI)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -137,14 +137,14 @@ class PaymentControllerTest {
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
                 .build();
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
+        PaymentLog paymentLog = PaymentLog.builder()
                 .totalAmount(100000L)
                 .sessionId(UUID.randomUUID())
                 .createdAt(new Date(Instant.now().toEpochMilli()))
                 .invoice(invoice)
                 .build();
 
-        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentLog);
 
         String requestBody = Util.mapToJson(paymentRequest);
 
@@ -158,7 +158,7 @@ class PaymentControllerTest {
 
         verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
 
-        when(paymentService.getPaymentLog()).thenReturn(List.of(paymentHistory));
+        when(paymentService.getPaymentLog()).thenReturn(List.of(paymentLog));
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isOk())
@@ -207,7 +207,7 @@ class PaymentControllerTest {
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
                 .build();
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
+        PaymentLog paymentLog = PaymentLog.builder()
                 .totalAmount(100000L)
                 .sessionId(UUID.randomUUID())
                 .createdAt(new Date(Instant.now().toEpochMilli()))
@@ -215,7 +215,7 @@ class PaymentControllerTest {
                 .createdAt(new Date(Instant.now().toEpochMilli()))
                 .build();
 
-        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentLog);
 
         String requestBody = Util.mapToJson(paymentRequest);
 
@@ -229,7 +229,7 @@ class PaymentControllerTest {
 
         verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
 
-        when(paymentService.getPaymentLogByYearAndMonth(any(Integer.class), any(Integer.class))).thenReturn(List.of(paymentHistory));
+        when(paymentService.getPaymentLogByYearAndMonth(any(Integer.class), any(Integer.class))).thenReturn(List.of(paymentLog));
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isOk())
@@ -280,14 +280,14 @@ class PaymentControllerTest {
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
                 .build();
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
+        PaymentLog paymentLog = PaymentLog.builder()
                 .totalAmount(100000L)
                 .sessionId(UUID.randomUUID())
                 .createdAt(new Date(Instant.now().toEpochMilli()))
                 .invoice(invoice)
                 .build();
 
-        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentLog);
 
         String requestBody = Util.mapToJson(paymentRequest);
 
@@ -301,7 +301,7 @@ class PaymentControllerTest {
 
         verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
 
-        when(paymentService.getPaymentLogByYear(any(Integer.class))).thenReturn(List.of(paymentHistory));
+        when(paymentService.getPaymentLogByYear(any(Integer.class))).thenReturn(List.of(paymentLog));
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isOk())
@@ -352,14 +352,14 @@ class PaymentControllerTest {
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
                 .build();
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
+        PaymentLog paymentLog = PaymentLog.builder()
                 .totalAmount(100000L)
                 .sessionId(UUID.randomUUID())
                 .createdAt(new Date(Instant.now().toEpochMilli()))
                 .invoice(invoice)
                 .build();
 
-        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentLog);
 
         String requestBody = Util.mapToJson(paymentRequest);
 
@@ -373,7 +373,7 @@ class PaymentControllerTest {
 
         verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
 
-        when(paymentService.getPaymentLogByWeekAndYear(any(Integer.class), any(Integer.class))).thenReturn(List.of(paymentHistory));
+        when(paymentService.getPaymentLogByWeekAndYear(any(Integer.class), any(Integer.class))).thenReturn(List.of(paymentLog));
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isOk())

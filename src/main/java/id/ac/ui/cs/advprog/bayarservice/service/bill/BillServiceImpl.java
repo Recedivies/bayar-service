@@ -5,7 +5,6 @@ import id.ac.ui.cs.advprog.bayarservice.dto.bill.BillRequest;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.repository.BillRepository;
-import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import id.ac.ui.cs.advprog.bayarservice.service.invoice.InvoiceService;
