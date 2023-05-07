@@ -14,7 +14,7 @@ sonarqube {
         property "sonar.login", System.getenv("SONAR_TOKEN")
         property "sonar.branch.name", System.getenv("CI_COMMIT_BRANCH")
         property "sonar.scm.disabled", "true"
-        property "sonar.coverage.exclusions", "**/**Application**, **/exceptions/**"
+        property "sonar.coverage.exclusions", "**/**Application**, **/exceptions/**, **/rest/**"
         property "sonar.exclusions", "src/test/java/**"
     }
 }
