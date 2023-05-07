@@ -6,7 +6,10 @@ import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyUsedExcept
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvalidPaymentMethodException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyPaidException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.warnet.SessionDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.warnet.WarnetServiceServerException;
 import id.ac.ui.cs.advprog.bayarservice.util.Response;
 import id.ac.ui.cs.advprog.bayarservice.util.ResponseHandler;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -31,6 +34,7 @@ public class GlobalExceptionHandler {
             BankDoesNotExistException.class,
             InvoiceDoesNotExistException.class,
             CouponDoesNotExistException.class,
+            SessionDoesNotExistException.class
     })
     public ResponseEntity<Object> notAvailableHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
@@ -43,6 +47,7 @@ public class GlobalExceptionHandler {
             InvalidPaymentMethodException.class,
             HttpMessageNotReadableException.class,
             CouponAlreadyUsedException.class,
+            InvoiceAlreadyPaidException.class
     })
     public ResponseEntity<Object> badRequestHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
@@ -69,7 +74,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(value = {Exception.class})
+    @ExceptionHandler(value = {Exception.class, WarnetServiceServerException.class})
     public ResponseEntity<Object> generalError(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
                 exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, FAILED, null)
