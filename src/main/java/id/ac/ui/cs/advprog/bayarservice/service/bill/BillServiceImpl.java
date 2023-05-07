@@ -49,24 +49,18 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill update(Integer id, BillRequest request) {
-        Invoice invoice = this.invoiceService.findBySessionId(request.getSessionId());
         Bill bill = this.billRepository.findById(id)
                 .orElseThrow(() -> new BillDoesNotExistException(id));
-//        if (isBillDoesNotExist(id)) {
-//            throw new BillDoesNotExistException(id);
-//        } else {
-//            Bill bill = billRepository.findById(id).orElseThrow();
         bill.setName(request.getName());
         bill.setPrice(request.getPrice());
         bill.setQuantity(request.getQuantity());
         bill.setSubTotal(request.getSubTotal());
 //            find invoice that has this bill
-//        Invoice invoice = invoiceService.findBySessionId(request.getSessionId());
+        Invoice invoice = this.invoiceService.findBySessionId(request.getSessionId());
         int toBeAdded = bill.getSubTotal().intValue();
         Integer toBeSubtracted = billRepository.findById(id).orElseThrow().getSubTotal().intValue();
         invoice.setTotalAmount(invoice.getTotalAmount() - toBeSubtracted + toBeAdded);
         return this.billRepository.save(bill);
-//        }
     }
 
     private boolean isBillDoesNotExist(Integer id) {
