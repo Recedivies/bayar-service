@@ -35,22 +35,13 @@ public class BillController {
 
     @DeleteMapping("/bills/delete/{billId}")
     public ResponseEntity<String> deleteBillById(@PathVariable Integer billId) {
-        if (billService.findById(billId) == null) {
-            return ResponseEntity.notFound().build();
-        }
         billService.delete(billId);
         return ResponseEntity.ok(String.format("Deleted Bill with id %d", billId));
     }
 
     @PutMapping("/bills/update/{billId}")
     public ResponseEntity<Bill> updateBillById(@PathVariable Integer billId, @RequestBody BillRequest request) {
-        if (billService.findById(billId) == null) {
-            return ResponseEntity.notFound().build();
-        }
         Bill updatedBill = billService.update(billId, request);
-        if (billService.findById(billId) == null) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(updatedBill);
     }
 }
