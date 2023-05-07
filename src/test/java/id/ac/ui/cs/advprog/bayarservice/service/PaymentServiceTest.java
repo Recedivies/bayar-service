@@ -2,12 +2,17 @@ package id.ac.ui.cs.advprog.bayarservice.service;
 
 import id.ac.ui.cs.advprog.bayarservice.core.PaymentReceiver;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.warnet.PCResponse;
+import id.ac.ui.cs.advprog.bayarservice.dto.warnet.SessionResponse;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyPaidException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
-import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentHistory;
+import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentStatus;
+import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentLog;
 import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import id.ac.ui.cs.advprog.bayarservice.repository.PaymentRepository;
+import id.ac.ui.cs.advprog.bayarservice.rest.WarnetService;
 import id.ac.ui.cs.advprog.bayarservice.service.payment.PaymentServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,14 +49,20 @@ public class PaymentServiceTest {
     @Mock
     private PaymentReceiver paymentReceiver;
 
+    @Mock
+    private WarnetService warnetService;
+
+    SessionResponse sessionResponse;
+    PCResponse pc;
     PaymentRequest createRequest;
-    PaymentHistory paymentHistory;
+    PaymentLog paymentLog;
     Invoice invoice;
     UUID uuid = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
         invoice = Invoice.builder()
+                .paymentStatus(PaymentStatus.UNPAID)
                 .paymentMethod(PaymentMethod.CASH)
                 .totalAmount(100000L)
                 .adminFee(5000)
@@ -64,12 +75,21 @@ public class PaymentServiceTest {
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
                 .build();
 
-        paymentHistory = PaymentHistory.builder()
+        paymentLog = PaymentLog.builder()
                 .id(1)
                 .totalAmount(100000L)
                 .createdAt(Date.valueOf(LocalDate.now()))
                 .sessionId(uuid)
                 .invoice(invoice)
+                .noPC(1)
+                .build();
+
+        pc = PCResponse.builder()
+                .noPC(1)
+                .build();
+
+        sessionResponse = SessionResponse.builder()
+                .pc(pc)
                 .build();
     }
 
@@ -86,18 +106,20 @@ public class PaymentServiceTest {
     @Test
     void whenCreatePaymentShouldReturnTheCreatedPaymentHistory() {
         when(invoiceRepository.findById(any())).thenReturn(Optional.of(invoice));
-        when(paymentRepository.save(any(PaymentHistory.class))).thenAnswer(invocation -> {
-            var pH = invocation.getArgument(0, PaymentHistory.class);
-            pH.setId(1);
-            pH.setTotalAmount(paymentHistory.getTotalAmount());
-            pH.setCreatedAt(paymentHistory.getCreatedAt());
-            return pH;
+        when(paymentRepository.save(any(PaymentLog.class))).thenAnswer(invocation -> {
+            var pL = invocation.getArgument(0, PaymentLog.class);
+            pL.setId(1);
+            pL.setTotalAmount(paymentLog.getTotalAmount());
+            pL.setCreatedAt(paymentLog.getCreatedAt());
+            return pL;
         });
 
-        PaymentHistory result = paymentService.create(invoice.getId(), createRequest);
+        when(warnetService.getSessionViaAPI(any())).thenReturn(sessionResponse);
 
-        verify(paymentRepository, atLeastOnce()).save(any(PaymentHistory.class));
-        Assertions.assertEquals(paymentHistory, result);
+        PaymentLog result = paymentService.create(invoice.getId(), createRequest);
+
+        verify(paymentRepository, atLeastOnce()).save(any(PaymentLog.class));
+        Assertions.assertEquals(paymentLog, result);
     }
 
     @Test
@@ -109,72 +131,81 @@ public class PaymentServiceTest {
     }
 
     @Test
+    void whenCreatePaymentShouldReturn400BadRequest() {
+        invoice.setPaymentStatus(PaymentStatus.PAID);
+        when(invoiceRepository.findById(any())).thenReturn(Optional.of(invoice));
+
+        Assertions.assertThrows(InvoiceAlreadyPaidException.class,
+                () -> paymentService.create(0, createRequest));
+    }
+
+    @Test
     void whenGetPaymentLogShouldReturnListOfAllPaymentLog() {
-        when(paymentRepository.findAll()).thenReturn(List.of(paymentHistory));
+        when(paymentRepository.findAll()).thenReturn(List.of(paymentLog));
 
-        List<PaymentHistory> result = paymentService.getPaymentLog();
+        List<PaymentLog> result = paymentService.getPaymentLog();
 
-        Assertions.assertEquals(List.of(paymentHistory), result);
+        Assertions.assertEquals(List.of(paymentLog), result);
     }
 
     @Test
     void whenGetPaymentLogByYearShouldReturnListOfPaymentLogByYear() {
-        when(paymentRepository.findAll()).thenReturn(List.of(paymentHistory));
+        when(paymentRepository.findAll()).thenReturn(List.of(paymentLog));
 
         int year = LocalDate.now().getYear();
 
-        List<PaymentHistory> result = paymentService.getPaymentLogByYear(year);
+        List<PaymentLog> result = paymentService.getPaymentLogByYear(year);
 
-        Assertions.assertEquals(List.of(paymentHistory), result);
+        Assertions.assertEquals(List.of(paymentLog), result);
     }
 
     @Test
     void whenGetPaymentLogByYearNotFoundShouldReturnEmptyList() {
-        when(paymentRepository.findAll()).thenReturn(List.of(paymentHistory));
+        when(paymentRepository.findAll()).thenReturn(List.of(paymentLog));
 
-        List<PaymentHistory> result = paymentService.getPaymentLogByYear(2021);
+        List<PaymentLog> result = paymentService.getPaymentLogByYear(2021);
 
         Assertions.assertEquals(List.of(), result);
     }
 
     @Test
     void whenGetPaymentLogByMonthShouldReturnListOfPaymentLogByMonth() {
-        when(paymentRepository.findAll()).thenReturn(List.of(paymentHistory));
+        when(paymentRepository.findAll()).thenReturn(List.of(paymentLog));
 
         int year = LocalDate.now().getYear();
         int month = LocalDate.now().getMonthValue();
 
-        List<PaymentHistory> result = paymentService.getPaymentLogByYearAndMonth(year, month);
+        List<PaymentLog> result = paymentService.getPaymentLogByYearAndMonth(year, month);
 
-        Assertions.assertEquals(List.of(paymentHistory), result);
+        Assertions.assertEquals(List.of(paymentLog), result);
     }
 
     @Test
     void whenGetPaymentLogByMonthNotFoundShouldReturnEmptyList() {
-        when(paymentRepository.findAll()).thenReturn(List.of(paymentHistory));
+        when(paymentRepository.findAll()).thenReturn(List.of(paymentLog));
 
-        List<PaymentHistory> result = paymentService.getPaymentLogByYearAndMonth(2020, 2);
+        List<PaymentLog> result = paymentService.getPaymentLogByYearAndMonth(2020, 2);
 
         Assertions.assertEquals(List.of(), result);
     }
 
     @Test
     void whenGetPaymentLogByWeekAndYearShouldReturnListOfPaymentLogByWeekAndYear() {
-        when(paymentRepository.findAll()).thenReturn(List.of(paymentHistory));
+        when(paymentRepository.findAll()).thenReturn(List.of(paymentLog));
 
         int year = LocalDate.now().getYear();
         int week = LocalDate.now().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
 
-        List<PaymentHistory> result = paymentService.getPaymentLogByWeekAndYear(year, week);
+        List<PaymentLog> result = paymentService.getPaymentLogByWeekAndYear(year, week);
 
-        Assertions.assertEquals(List.of(paymentHistory), result);
+        Assertions.assertEquals(List.of(paymentLog), result);
     }
 
     @Test
     void whenGetPaymentLogByWeekAndYearNotFoundShouldReturnEmptyList() {
-        when(paymentRepository.findAll()).thenReturn(List.of(paymentHistory));
+        when(paymentRepository.findAll()).thenReturn(List.of(paymentLog));
 
-        List<PaymentHistory> result = paymentService.getPaymentLogByWeekAndYear(2020, 2);
+        List<PaymentLog> result = paymentService.getPaymentLogByWeekAndYear(2020, 2);
 
         Assertions.assertEquals(List.of(), result);
     }

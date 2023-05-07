@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
-import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentHistory;
+import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentLog;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -59,7 +59,7 @@ public class Invoice {
     @JsonManagedReference
     @JsonIgnore
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
-    private List<PaymentHistory> paymentHistories;
+    private List<PaymentLog> paymentHistories;
 
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
