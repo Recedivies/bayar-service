@@ -16,6 +16,7 @@ sonarqube {
         property "sonar.scm.disabled", "true"
         property "sonar.coverage.exclusions", "**/**Application**, **/exceptions/**, **/rest/**"
         property "sonar.exclusions", "src/test/java/**"
+        property "sonar.test.exclusions", "src/**/*Application**, src/**/dto/**, src/**/exception/**, src/**/model/**, src/**/util/**, src/**/rest/**"
     }
 }
 
