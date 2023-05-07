@@ -35,7 +35,11 @@ public class BillServiceTest {
 
     Bill bill;
 
+    Bill newBill;
+
     Invoice invoice;
+
+    BillRequest updateRequest;
 
     @BeforeEach
     void setUp() {
@@ -50,6 +54,20 @@ public class BillServiceTest {
                 .id(1)
                 .totalAmount(50000L)
                 .sessionId(UUID.randomUUID())
+                .build();
+
+        updateRequest = BillRequest.builder()
+                .name("Coffee Updated")
+                .quantity(10)
+                .price(10000)
+                .subTotal(100000L)
+                .build();
+
+        newBill = Bill.builder()
+                .name("Coffee Updated")
+                .quantity(10)
+                .price(10000)
+                .subTotal(100000L)
                 .build();
     }
 
@@ -96,5 +114,25 @@ public class BillServiceTest {
 
         verify(billRepository, atLeastOnce()).save(any(Bill.class));
         Assertions.assertEquals(bill, result);
+    }
+
+    @Test
+    void whenUpdateBillAndFoundShouldReturnTheUpdatedBill() {
+        when(invoiceService.findBySessionId(any())).thenReturn(invoice);
+        when(billRepository.findById(any(Integer.class))).thenReturn(Optional.of(bill));
+
+        when(billRepository.save(any(Bill.class))).thenAnswer(invocation ->
+                invocation.getArgument(0, Bill.class));
+
+        Bill result = billService.update(0, updateRequest);
+        verify(billRepository, atLeastOnce()).save(any(Bill.class));
+        Assertions.assertEquals(newBill, result);
+    }
+
+    @Test
+    void whenUpdateBillAndNotFoundShouldThrowException() {
+        when(billRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
+        Assertions.assertThrows(BillDoesNotExistException.class,
+                () -> billService.update(0, updateRequest));
     }
 }
