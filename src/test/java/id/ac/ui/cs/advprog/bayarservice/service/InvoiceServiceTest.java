@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class InvoiceServiceTest {
+class InvoiceServiceTest {
 
     @InjectMocks
     private InvoiceServiceImpl invoiceService;
@@ -38,7 +38,7 @@ public class InvoiceServiceTest {
     Bill newBill;
     InvoiceRequest createRequest;
     InvoiceRequest updateRequest;
-    UUID uuid = UUID.randomUUID();
+    UUID uuid;
 
     @BeforeEach
     void setUp() {
@@ -79,6 +79,8 @@ public class InvoiceServiceTest {
                 .price(20000)
                 .subTotal(200000L)
                 .build();
+
+         uuid = UUID.randomUUID();
     }
 
     @Test
@@ -97,7 +99,7 @@ public class InvoiceServiceTest {
 
     @Test
     void whenCreateInvoiceAndAlreadyExistShouldThrowException() {
-        when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
+        when(invoiceRepository.findBySessionId(any())).thenReturn(Optional.of(invoice));
 
         Assertions.assertThrows(InvoiceAlreadyExistException.class,
                 () -> invoiceService.create(createRequest));
@@ -130,7 +132,7 @@ public class InvoiceServiceTest {
     void whenFindBySessionIdAndFoundShouldReturnInvoice() {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
 
-        Invoice result = invoiceService.findBySessionId(UUID.randomUUID());
+        Invoice result = invoiceService.findBySessionId(uuid);
 
         verify(invoiceRepository, atLeastOnce()).findBySessionId(any(UUID.class));
         Assertions.assertEquals(invoice, result);
@@ -141,7 +143,7 @@ public class InvoiceServiceTest {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.empty());
 
         Assertions.assertThrows(InvoiceDoesNotExistException.class,
-                () -> invoiceService.findBySessionId(UUID.randomUUID()));
+                () -> invoiceService.findBySessionId(uuid));
     }
 }
 

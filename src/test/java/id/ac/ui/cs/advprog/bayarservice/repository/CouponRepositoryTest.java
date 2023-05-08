@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class CouponRepositoryTest {
+class CouponRepositoryTest {
     @Autowired
     private CouponRepository couponRepository;
 

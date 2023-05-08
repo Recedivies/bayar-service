@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.Optional;
 
 @SpringBootTest
-public class PaymentHandlerRegistryTest {
+class PaymentHandlerRegistryTest {
 
     @Autowired
     private PaymentHandlerRegistry paymentHandlerRegistry;
