@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = BankController.class)
 @AutoConfigureMockMvc
-public class BankControllerTest {
+class BankControllerTest {
     private static final String END_POINT_PATH = "/api/v1/";
 
     @Autowired

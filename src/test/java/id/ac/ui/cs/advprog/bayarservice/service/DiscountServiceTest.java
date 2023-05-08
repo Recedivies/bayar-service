@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class DiscountServiceTest {
+class DiscountServiceTest {
     @InjectMocks
     private DiscountServiceImpl discountService;
 
@@ -31,6 +31,7 @@ public class DiscountServiceTest {
     Invoice invoice;
     DiscountRequest nominalDiscountRequest;
     DiscountRequest percentageDiscountRequest;
+    UUID uuid;
 
     @BeforeEach
     void setUp() {
@@ -49,13 +50,14 @@ public class DiscountServiceTest {
                 .discount(50L)
                 .build();
 
+        uuid = UUID.randomUUID();
     }
 
     @Test
     void whenGiveNominalDiscountShouldUpdateInvoiceDiscount() {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
 
-        discountService.giveDiscount(UUID.randomUUID(), nominalDiscountRequest);
+        discountService.giveDiscount(uuid, nominalDiscountRequest);
         verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
     }
 
@@ -69,7 +71,7 @@ public class DiscountServiceTest {
             return invoice;
         });
 
-        discountService.giveDiscount(UUID.randomUUID(), nominalDiscountRequest);
+        discountService.giveDiscount(uuid, nominalDiscountRequest);
         verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
         Assertions.assertEquals(0L, invoice.getTotalAmount());
     }
@@ -78,14 +80,14 @@ public class DiscountServiceTest {
     void whenGiveNominalDiscountAndInvoiceNotFoundThrowException() {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.empty());
         Assertions.assertThrows(InvoiceDoesNotExistException.class,
-                () -> discountService.giveDiscount(UUID.randomUUID(), nominalDiscountRequest));
+                () -> discountService.giveDiscount(uuid, nominalDiscountRequest));
     }
 
     @Test
     void whenGivePercentageDiscountShouldUpdateInvoiceDiscount() {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
 
-        discountService.giveDiscount(UUID.randomUUID(), percentageDiscountRequest);
+        discountService.giveDiscount(uuid, percentageDiscountRequest);
         verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
     }
 
@@ -99,7 +101,7 @@ public class DiscountServiceTest {
             return invoice;
         });
 
-        discountService.giveDiscount(UUID.randomUUID(), percentageDiscountRequest);
+        discountService.giveDiscount(uuid, percentageDiscountRequest);
         verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
         Assertions.assertEquals(0L, invoice.getTotalAmount());
     }
@@ -108,7 +110,7 @@ public class DiscountServiceTest {
     void whenGivePercentageDiscountAndInvoiceNotFoundThrowException() {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.empty());
         Assertions.assertThrows(InvoiceDoesNotExistException.class,
-                () -> discountService.giveDiscount(UUID.randomUUID(), percentageDiscountRequest));
+                () -> discountService.giveDiscount(uuid, percentageDiscountRequest));
     }
 
 }

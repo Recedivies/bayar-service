@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class InvoiceRepositoryTest {
+class InvoiceRepositoryTest {
 
     @MockBean
     private BillRepository billRepository;

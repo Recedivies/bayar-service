@@ -9,12 +9,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = HealthCheckController.class)
-public class HealthCheckControllerTest {
+class HealthCheckControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    public void healthCheckShouldReturn200() throws Exception {
+    void healthCheckShouldReturn200() throws Exception {
         this.mockMvc.perform(get("/health")).andExpect(status().isOk());
     }
 }

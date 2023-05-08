@@ -59,7 +59,7 @@ class InvoiceControllerTest {
     }
 
     @Test
-    public void testAddInvoiceShouldReturn400BadRequest() throws Exception {
+    void testAddInvoiceShouldReturn400BadRequest() throws Exception {
         Invoice invoice = Invoice.builder().build();
 
         String requestBody = Util.mapToJson(invoice);
@@ -74,7 +74,7 @@ class InvoiceControllerTest {
     }
 
     @Test
-    public void testAddInvoiceShouldReturn405MethodNotAllowed() throws Exception {
+    void testAddInvoiceShouldReturn405MethodNotAllowed() throws Exception {
         Invoice invoice = Invoice.builder().build();
 
         String requestBody = Util.mapToJson(invoice);

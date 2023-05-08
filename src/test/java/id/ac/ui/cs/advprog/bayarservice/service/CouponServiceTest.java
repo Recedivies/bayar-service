@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CouponServiceTest {
+class CouponServiceTest {
     @InjectMocks
     private CouponServiceImpl couponService;
 
@@ -42,6 +42,7 @@ public class CouponServiceTest {
     Coupon newCoupon;
     CouponRequest updateRequest;
     UseCouponRequest useCouponRequest;
+    UUID uuid;
 
     @BeforeEach
     void setUp() {
@@ -68,6 +69,8 @@ public class CouponServiceTest {
         useCouponRequest = UseCouponRequest.builder()
                 .name("SEPTEMBERCERIA")
                 .build();
+
+        uuid = UUID.randomUUID();
     }
 
     @Test
@@ -117,18 +120,19 @@ public class CouponServiceTest {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
         when(couponRepository.findByName(any(String.class))).thenReturn(Optional.of(coupon));
 
-        couponService.useCoupon(UUID.randomUUID(), useCouponRequest);
+        couponService.useCoupon(uuid, useCouponRequest);
         verify(couponRepository, atLeastOnce()).save(any(Coupon.class));
     }
 
     @Test
     void whenUseCouponAndCouponAlreadyUsedThrowException() {
+
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
         coupon.setUsed(true);
         when(couponRepository.findByName(any(String.class))).thenReturn(Optional.of(coupon));
 
         Assertions.assertThrows(CouponAlreadyUsedException.class,
-                () -> couponService.useCoupon(UUID.randomUUID(), useCouponRequest));
+                () -> couponService.useCoupon(uuid, useCouponRequest));
     }
 
     @Test
@@ -143,7 +147,7 @@ public class CouponServiceTest {
             return invoice;
         });
 
-        couponService.useCoupon(UUID.randomUUID(), useCouponRequest);
+        couponService.useCoupon(uuid, useCouponRequest);
         verify(couponRepository, atLeastOnce()).save(any(Coupon.class));
         Assertions.assertEquals(0L, invoice.getTotalAmount());
     }
@@ -152,7 +156,7 @@ public class CouponServiceTest {
     void whenUseCouponAndInvoiceNotFoundThrowException() {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.empty());
         Assertions.assertThrows(InvoiceDoesNotExistException.class,
-                () -> couponService.useCoupon(UUID.randomUUID(), useCouponRequest));
+                () -> couponService.useCoupon(uuid, useCouponRequest));
     }
 
     @Test
@@ -160,7 +164,7 @@ public class CouponServiceTest {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
         when(couponRepository.findByName(any())).thenReturn(Optional.empty());
         Assertions.assertThrows(CouponDoesNotExistException.class,
-                () -> couponService.useCoupon(UUID.randomUUID(), useCouponRequest));
+                () -> couponService.useCoupon(uuid, useCouponRequest));
     }
 
     @Test
