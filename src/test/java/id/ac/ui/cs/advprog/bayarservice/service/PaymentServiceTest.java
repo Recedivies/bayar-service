@@ -1,15 +1,19 @@
 package id.ac.ui.cs.advprog.bayarservice.service;
 
 import id.ac.ui.cs.advprog.bayarservice.core.PaymentReceiver;
+import id.ac.ui.cs.advprog.bayarservice.dto.payment.DetailPaymentLogResponse;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
 import id.ac.ui.cs.advprog.bayarservice.dto.warnet.PCResponse;
 import id.ac.ui.cs.advprog.bayarservice.dto.warnet.SessionResponse;
+import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyPaidException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentStatus;
 import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentLog;
+import id.ac.ui.cs.advprog.bayarservice.repository.BankRepository;
 import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import id.ac.ui.cs.advprog.bayarservice.repository.PaymentRepository;
 import id.ac.ui.cs.advprog.bayarservice.rest.WarnetService;
@@ -47,6 +51,9 @@ public class PaymentServiceTest {
     private PaymentRepository paymentRepository;
 
     @Mock
+    private BankRepository bankRepository;
+
+    @Mock
     private PaymentReceiver paymentReceiver;
 
     @Mock
@@ -57,6 +64,7 @@ public class PaymentServiceTest {
     PaymentRequest createRequest;
     PaymentLog paymentLog;
     Invoice invoice;
+    Bank bank;
     UUID uuid = UUID.randomUUID();
 
     @BeforeEach
@@ -65,7 +73,6 @@ public class PaymentServiceTest {
                 .paymentStatus(PaymentStatus.UNPAID)
                 .paymentMethod(PaymentMethod.CASH)
                 .totalAmount(100000L)
-                .adminFee(5000)
                 .discount(5000L)
                 .build();
 
@@ -77,11 +84,18 @@ public class PaymentServiceTest {
 
         paymentLog = PaymentLog.builder()
                 .id(1)
+                .paymentMethod(PaymentMethod.CASH)
                 .totalAmount(100000L)
                 .createdAt(Date.valueOf(LocalDate.now()))
                 .sessionId(uuid)
                 .invoice(invoice)
                 .noPC(1)
+                .build();
+
+        bank = Bank.builder()
+                .id(1)
+                .name("BNI")
+                .adminFee(5000)
                 .build();
 
         pc = PCResponse.builder()
@@ -123,6 +137,29 @@ public class PaymentServiceTest {
     }
 
     @Test
+    void whenCreatePaymentWithBankShouldReturnTheCreatedPaymentHistory() {
+        createRequest.setPaymentMethod(String.valueOf(PaymentMethod.BANK));
+        createRequest.setBankId(bank.getId());
+        paymentLog.setPaymentMethod(PaymentMethod.BANK);
+        when(invoiceRepository.findById(any())).thenReturn(Optional.of(invoice));
+        when(paymentRepository.save(any(PaymentLog.class))).thenAnswer(invocation -> {
+            var pL = invocation.getArgument(0, PaymentLog.class);
+            pL.setId(1);
+            pL.setTotalAmount(paymentLog.getTotalAmount());
+            pL.setCreatedAt(paymentLog.getCreatedAt());
+            return pL;
+        });
+
+        when(warnetService.getSessionViaAPI(any())).thenReturn(sessionResponse);
+        when(bankRepository.findById(any())).thenReturn(Optional.of(bank));
+
+        PaymentLog result = paymentService.create(invoice.getId(), createRequest);
+
+        verify(paymentRepository, atLeastOnce()).save(any(PaymentLog.class));
+        Assertions.assertEquals(paymentLog, result);
+    }
+
+    @Test
     void whenCreatePaymentShouldReturn404InvoiceNotFound() {
         when(invoiceRepository.findById(any())).thenReturn(Optional.empty());
 
@@ -131,11 +168,23 @@ public class PaymentServiceTest {
     }
 
     @Test
-    void whenCreatePaymentShouldReturn400BadRequest() {
+    void whenCreatePaymentAndInvoiceAlreadyExistShouldReturn400BadRequest() {
         invoice.setPaymentStatus(PaymentStatus.PAID);
         when(invoiceRepository.findById(any())).thenReturn(Optional.of(invoice));
 
         Assertions.assertThrows(InvoiceAlreadyPaidException.class,
+                () -> paymentService.create(0, createRequest));
+    }
+
+    @Test
+    void whenCreatePaymentShouldAndBankNotFoundReturn404NotFound() {
+        createRequest.setPaymentMethod(String.valueOf(PaymentMethod.BANK));
+        createRequest.setBankId(100);
+        when(invoiceRepository.findById(any())).thenReturn(Optional.of(invoice));
+        when(warnetService.getSessionViaAPI(any())).thenReturn(sessionResponse);
+        when(bankRepository.findById(any())).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(BankDoesNotExistException.class,
                 () -> paymentService.create(0, createRequest));
     }
 
@@ -208,5 +257,23 @@ public class PaymentServiceTest {
         List<PaymentLog> result = paymentService.getPaymentLogByWeekAndYear(2020, 2);
 
         Assertions.assertEquals(List.of(), result);
+    }
+
+    @Test
+    void whenGetPaymentLogDetailShouldReturnDetailPaymentLogResponse() {
+        when(paymentRepository.findBySessionId(any())).thenReturn(Optional.of(paymentLog));
+        invoice.setPaymentMethod(PaymentMethod.BANK);
+        invoice.setBank(bank);
+        when(invoiceRepository.findBySessionId(any())).thenReturn(Optional.of(invoice));
+
+        DetailPaymentLogResponse detailPaymentLogResponse = DetailPaymentLogResponse.builder()
+                .invoice(invoice)
+                .paymentLog(paymentLog)
+                .bank(bank)
+                .build();
+
+        DetailPaymentLogResponse result = paymentService.getPaymentLogDetail(uuid);
+
+        Assertions.assertEquals(detailPaymentLogResponse, result);
     }
 }

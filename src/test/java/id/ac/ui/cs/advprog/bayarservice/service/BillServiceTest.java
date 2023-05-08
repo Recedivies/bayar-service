@@ -43,17 +43,18 @@ public class BillServiceTest {
 
     @BeforeEach
     void setUp() {
+        invoice = Invoice.builder()
+                .id(1)
+                .totalAmount(50000L)
+                .sessionId(UUID.randomUUID())
+                .build();
+
         bill = Bill.builder()
                 .name("Coffee")
                 .quantity(5)
                 .price(10000)
                 .subTotal(50000L)
-                .build();
-
-        invoice = Invoice.builder()
-                .id(1)
-                .totalAmount(50000L)
-                .sessionId(UUID.randomUUID())
+                .invoice(invoice)
                 .build();
 
         updateRequest = BillRequest.builder()
@@ -68,6 +69,7 @@ public class BillServiceTest {
                 .quantity(10)
                 .price(10000)
                 .subTotal(100000L)
+                .invoice(invoice)
                 .build();
     }
 
@@ -118,11 +120,12 @@ public class BillServiceTest {
 
     @Test
     void whenUpdateBillAndFoundShouldReturnTheUpdatedBill() {
-        when(invoiceService.findBySessionId(any())).thenReturn(invoice);
         when(billRepository.findById(any(Integer.class))).thenReturn(Optional.of(bill));
 
         when(billRepository.save(any(Bill.class))).thenAnswer(invocation ->
                 invocation.getArgument(0, Bill.class));
+
+        when(invoiceService.findById(any())).thenReturn(invoice);
 
         Bill result = billService.update(0, updateRequest);
         verify(billRepository, atLeastOnce()).save(any(Bill.class));

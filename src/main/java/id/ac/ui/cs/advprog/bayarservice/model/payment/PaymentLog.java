@@ -2,6 +2,7 @@ package id.ac.ui.cs.advprog.bayarservice.model.payment;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
+import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,10 @@ public class PaymentLog {
 
     @Column(nullable = false)
     private Long totalAmount;
+
+    @Column(columnDefinition = "VARCHAR(5)")
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE default CURRENT_TIMESTAMP")

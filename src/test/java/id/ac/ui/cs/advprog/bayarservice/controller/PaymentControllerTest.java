@@ -1,7 +1,9 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
+import id.ac.ui.cs.advprog.bayarservice.dto.payment.DetailPaymentLogResponse;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
+import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentLog;
@@ -57,7 +59,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -125,7 +126,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -195,7 +195,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -268,7 +267,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -340,7 +338,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -404,4 +401,43 @@ class PaymentControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    public void testGetPaymentLogDetailAndReturn200() throws Exception {
+        UUID sessionId = UUID.randomUUID();
+        String requestURI = END_POINT_PATH + "/log/paymentLog/detail/" + sessionId;
+
+        Invoice invoice = Invoice.builder()
+                .paymentMethod(PaymentMethod.CASH)
+                .totalAmount(100000L)
+                .discount(5000L)
+                .sessionId(UUID.randomUUID())
+                .build();
+
+        PaymentLog paymentLog = PaymentLog.builder()
+                .totalAmount(100000L)
+                .sessionId(UUID.randomUUID())
+                .invoice(invoice)
+                .build();
+
+
+        Bank bank = Bank.builder().build();
+
+        DetailPaymentLogResponse response =
+                DetailPaymentLogResponse.builder()
+                        .bank(bank)
+                        .invoice(invoice)
+                        .paymentLog(paymentLog)
+                        .build();
+
+        when(paymentService.getPaymentLogDetail(sessionId))
+                .thenReturn(response);
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("getPaymentLogDetail"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+
+        verify(paymentService, atMostOnce()).getPaymentLogDetail(sessionId);
+    }
 }
