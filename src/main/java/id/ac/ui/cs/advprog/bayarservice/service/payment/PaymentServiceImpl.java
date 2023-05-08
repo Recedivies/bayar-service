@@ -2,8 +2,11 @@ package id.ac.ui.cs.advprog.bayarservice.service.payment;
 
 import id.ac.ui.cs.advprog.bayarservice.core.*;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.payment.DetailPaymentLogResponse;
+import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyPaidException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentStatus;
@@ -17,6 +20,8 @@ import org.springframework.stereotype.Service;
 import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Service
@@ -88,5 +93,20 @@ public class PaymentServiceImpl implements PaymentService {
                 .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year &&
                         paymentHistory.getCreatedAt().toLocalDate().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()) == week)
                 .toList();
+    }
+
+    public DetailPaymentLogResponse getPaymentLogDetail(UUID sessionId) {
+        PaymentLog paymentLog = this.paymentRepository.findBySessionId(sessionId);
+        Invoice invoice = this.invoiceRepository.findBySessionId(sessionId).
+                orElseThrow(() -> new InvoiceDoesNotExistException(sessionId));
+        Bank bank = null;
+        if (invoice.getPaymentMethod().equals(PaymentMethod.BANK)) {
+            bank = invoice.getBank();
+        }
+        return DetailPaymentLogResponse.builder()
+                .paymentLog(paymentLog)
+                .invoice(invoice)
+                .bank(bank)
+                .build();
     }
 }
