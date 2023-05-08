@@ -120,7 +120,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentShouldReturn200OK() throws Exception {
+    void testGetLogPaymentShouldReturn200OK() throws Exception {
         int invoiceId = 123;
         String requestURI = END_POINT_PATH + "/log/paymentLog";
 
@@ -168,7 +168,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentShouldReturn405MethodNotAllowed() throws Exception {
+    void testGetLogPaymentShouldReturn405MethodNotAllowed() throws Exception {
         String requestURI = END_POINT_PATH + "/log/paymentLog";
 
         mockMvc.perform(post(requestURI))
@@ -187,7 +187,7 @@ class PaymentControllerTest {
                 .andDo(print());
     }
     @Test
-    public void testGetLogPaymentByYearAndMonthShouldReturn200OK() throws Exception {
+    void testGetLogPaymentByYearAndMonthShouldReturn200OK() throws Exception {
         int invoiceId = 123;
         int year = LocalDate.now().getYear();
         int month = LocalDate.now().getMonthValue();
@@ -238,7 +238,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentByYearAndMonthShouldReturn405MethodNotAllowed() throws Exception {
+    void testGetLogPaymentByYearAndMonthShouldReturn405MethodNotAllowed() throws Exception {
         int year = LocalDate.now().getYear();
         int month = LocalDate.now().getMonthValue();
         String requestURI = END_POINT_PATH + "/log/paymentLog/monthly/" + year + "/" + month;
@@ -260,7 +260,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentByYearShouldReturn200K() throws Exception {
+    void testGetLogPaymentByYearShouldReturn200K() throws Exception {
         int invoiceId = 123;
         int year = LocalDate.now().getYear();
         String requestURI = END_POINT_PATH + "/log/paymentLog/" + year;
@@ -309,7 +309,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentByYearShouldReturn405MethodNotAllowed() throws Exception {
+    void testGetLogPaymentByYearShouldReturn405MethodNotAllowed() throws Exception {
         int year = LocalDate.now().getYear();
         String requestURI = END_POINT_PATH + "/log/paymentLog/" + year;
 
@@ -330,7 +330,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentByWeekAndYearShouldReturn2000K () throws Exception {
+    void testGetLogPaymentByWeekAndYearShouldReturn2000K () throws Exception {
         int invoiceId = 123;
         int year = LocalDate.now().getYear();
         int week = LocalDate.now().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
@@ -380,7 +380,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentByWeekAndYearShouldReturn405MethodNotAllowed() throws Exception {
+    void testGetLogPaymentByWeekAndYearShouldReturn405MethodNotAllowed() throws Exception {
         int year = LocalDate.now().getYear();
         int week = LocalDate.now().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
         String requestURI = END_POINT_PATH + "/log/paymentLog/weekly/" + year + "/" + week;
@@ -402,7 +402,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetPaymentLogDetailAndReturn200() throws Exception {
+    void testGetPaymentLogDetailAndReturn200() throws Exception {
         UUID sessionId = UUID.randomUUID();
         String requestURI = END_POINT_PATH + "/log/paymentLog/detail/" + sessionId;
 
