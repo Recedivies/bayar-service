@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
+import id.ac.ui.cs.advprog.bayarservice.dto.payment.DetailPaymentLogResponse;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
 import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentLog;
 import id.ac.ui.cs.advprog.bayarservice.service.payment.PaymentServiceImpl;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -21,7 +23,6 @@ public class PaymentController {
     private final PaymentServiceImpl paymentService;
     private static final String SUCCESS = "SUCCESS";
     private static final String RETRIEVED = "Success retrieved data";
-
 
     @GetMapping("/methods")
     public ResponseEntity<Object> getPaymentMethods() {
@@ -66,6 +67,14 @@ public class PaymentController {
     @GetMapping("/log/paymentLog/weekly/{year}/{week}")
     public ResponseEntity<Object> getPaymentLogByWeekAndYear(@PathVariable Integer year, @PathVariable Integer week) {
         List<PaymentLog> response = paymentService.getPaymentLogByWeekAndYear(year, week);
+        return ResponseHandler.generateResponse(new Response(
+                RETRIEVED, HttpStatus.OK, SUCCESS, response)
+        );
+    }
+
+    @GetMapping("/log/paymentLog/detail/{sessionId}")
+    public ResponseEntity<Object> getPaymentLogDetail(@PathVariable UUID sessionId) {
+        DetailPaymentLogResponse response = paymentService.getPaymentLogDetail(sessionId);
         return ResponseHandler.generateResponse(new Response(
                 RETRIEVED, HttpStatus.OK, SUCCESS, response)
         );

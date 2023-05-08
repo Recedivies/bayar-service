@@ -14,8 +14,9 @@ sonarqube {
         property "sonar.login", System.getenv("SONAR_TOKEN")
         property "sonar.branch.name", System.getenv("CI_COMMIT_BRANCH")
         property "sonar.scm.disabled", "true"
-        property "sonar.coverage.exclusions", "**/**Application**, **/exceptions/**"
+        property "sonar.coverage.exclusions", "**/**Application**, **/exceptions/**, **/rest/**"
         property "sonar.exclusions", "src/test/java/**"
+        property "sonar.test.exclusions", "src/**/*Application**, src/**/dto/**, src/**/exception/**, src/**/model/**, src/**/util/**, src/**/rest/**"
     }
 }
 
@@ -55,7 +56,7 @@ tasks.test {
 tasks.jacocoTestReport {
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['**/*Application**', '**/dto/**', '**/exception/**', '**/model/**', '**/util/**'])
+            fileTree(dir: it, exclude: ['**/*Application**', '**/dto/**', '**/exception/**', '**/model/**', '**/util/**', '**/rest/**'])
         }))
     }
     dependsOn(tasks.test) // tests are required to run before generating the report

@@ -55,8 +55,9 @@ public class CouponServiceImpl implements  CouponService {
         if (coupon.isUsed()) {
             throw new CouponAlreadyUsedException(request.getName());
         }
-        handleInvoiceDiscount(invoice, coupon.getDiscount());
         coupon.setUsed(true);
+        invoice.setDiscount(invoice.getDiscount() + coupon.getDiscount());
+
         this.couponRepository.save(coupon);
         this.invoiceRepository.save(invoice);
     }
@@ -77,7 +78,7 @@ public class CouponServiceImpl implements  CouponService {
 
     @Override
     public void deleteCoupon(Integer id) {
-        if (!this.couponRepository.findById(id).isPresent()) {
+        if (this.couponRepository.findById(id).isEmpty()) {
             throw new CouponDoesNotExistException(id);
         }
         this.couponRepository.deleteById(id);
@@ -85,14 +86,5 @@ public class CouponServiceImpl implements  CouponService {
 
     private boolean isCouponAlreadyExist(String name) {
         return this.couponRepository.findByName(name).isPresent();
-    }
-
-    private void handleInvoiceDiscount(Invoice invoice, long discountCoupon) {
-        invoice.setDiscount(invoice.getDiscount() + discountCoupon);
-        if (invoice.getTotalAmount() - discountCoupon < 0) {
-            invoice.setTotalAmount(0L);
-        } else {
-            invoice.setTotalAmount(invoice.getTotalAmount() - discountCoupon);
-        }
     }
 }

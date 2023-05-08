@@ -34,7 +34,8 @@ public class GlobalExceptionHandler {
             BankDoesNotExistException.class,
             InvoiceDoesNotExistException.class,
             CouponDoesNotExistException.class,
-            SessionDoesNotExistException.class
+            SessionDoesNotExistException.class,
+            PaymentLogDoesNotExistException.class
     })
     public ResponseEntity<Object> notAvailableHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(

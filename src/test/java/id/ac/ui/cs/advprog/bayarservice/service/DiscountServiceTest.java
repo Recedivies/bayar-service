@@ -44,7 +44,7 @@ public class DiscountServiceTest {
                 .discount(50000L)
                 .build();
 
-        percentageDiscountRequest = DiscountRequest.builder()
+            percentageDiscountRequest = DiscountRequest.builder()
                 .discountType("Percentage")
                 .discount(50L)
                 .build();
