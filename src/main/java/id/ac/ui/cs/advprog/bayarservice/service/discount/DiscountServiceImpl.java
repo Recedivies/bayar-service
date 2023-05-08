@@ -26,7 +26,7 @@ public class DiscountServiceImpl implements  DiscountService {
             invoice.setDiscount(invoice.getDiscount() + request.getDiscount());
         }
 
-        else if(request.getDiscountType().equals("Percentage")) {
+        if (request.getDiscountType().equals("Percentage")) {
             long newDiscount = (invoice.getTotalAmount()/100) * request.getDiscount();
             invoice.setDiscount(invoice.getDiscount() + newDiscount);
         }

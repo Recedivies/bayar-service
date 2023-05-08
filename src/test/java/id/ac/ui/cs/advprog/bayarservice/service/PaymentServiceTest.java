@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.bayarservice.service;
 
 import id.ac.ui.cs.advprog.bayarservice.core.PaymentReceiver;
+import id.ac.ui.cs.advprog.bayarservice.dto.payment.DetailPaymentLogResponse;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
 import id.ac.ui.cs.advprog.bayarservice.dto.warnet.PCResponse;
 import id.ac.ui.cs.advprog.bayarservice.dto.warnet.SessionResponse;
@@ -256,5 +257,23 @@ public class PaymentServiceTest {
         List<PaymentLog> result = paymentService.getPaymentLogByWeekAndYear(2020, 2);
 
         Assertions.assertEquals(List.of(), result);
+    }
+
+    @Test
+    void whenGetPaymentLogDetailShouldReturnDetailPaymentLogResponse() {
+        when(paymentRepository.findBySessionId(any())).thenReturn(Optional.of(paymentLog));
+        invoice.setPaymentMethod(PaymentMethod.BANK);
+        invoice.setBank(bank);
+        when(invoiceRepository.findBySessionId(any())).thenReturn(Optional.of(invoice));
+
+        DetailPaymentLogResponse detailPaymentLogResponse = DetailPaymentLogResponse.builder()
+                .invoice(invoice)
+                .paymentLog(paymentLog)
+                .bank(bank)
+                .build();
+
+        DetailPaymentLogResponse result = paymentService.getPaymentLogDetail(uuid);
+
+        Assertions.assertEquals(detailPaymentLogResponse, result);
     }
 }
