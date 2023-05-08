@@ -33,7 +33,6 @@ public class BillRepositoryTest {
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
                 .paymentStatus(PaymentStatus.UNPAID)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(uuid)

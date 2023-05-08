@@ -57,7 +57,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -125,7 +124,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -195,7 +193,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -268,7 +265,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -340,7 +336,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())

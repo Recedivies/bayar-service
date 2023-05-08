@@ -24,7 +24,6 @@ public class PaymentController {
     private static final String SUCCESS = "SUCCESS";
     private static final String RETRIEVED = "Success retrieved data";
 
-
     @GetMapping("/methods")
     public ResponseEntity<Object> getPaymentMethods() {
         List<String> response = paymentService.getPaymentMethods();

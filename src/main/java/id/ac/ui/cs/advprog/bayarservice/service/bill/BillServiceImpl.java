@@ -48,15 +48,16 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill update(Integer id, BillRequest request) {
-        long toBeSubtracted = billRepository.findById(id).orElseThrow().getSubTotal();
         Bill bill = this.billRepository.findById(id)
                 .orElseThrow(() -> new BillDoesNotExistException(id));
         bill.setName(request.getName());
         bill.setPrice(request.getPrice());
         bill.setQuantity(request.getQuantity());
         bill.setSubTotal(request.getSubTotal());
+
         Invoice invoice = this.invoiceService.findById(bill.getInvoice().getId());
         long toBeAdded = request.getSubTotal();
+        long toBeSubtracted = bill.getSubTotal();
         invoice.setTotalAmount(invoice.getTotalAmount() - toBeSubtracted + toBeAdded);
         return this.billRepository.save(bill);
     }

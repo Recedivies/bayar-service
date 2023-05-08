@@ -63,7 +63,6 @@ public class InvoiceServiceTest {
                 .id(1)
                 .paymentMethod(PaymentMethod.CASH)
                 .totalAmount(210000L)
-                .adminFee(20000)
                 .discount(10000L)
                 .build();
 

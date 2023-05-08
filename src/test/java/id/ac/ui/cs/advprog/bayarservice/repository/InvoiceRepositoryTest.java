@@ -37,7 +37,6 @@ public class InvoiceRepositoryTest {
                 .paymentMethod(PaymentMethod.CASH)
                 .paymentStatus(PaymentStatus.UNPAID)
                 .totalAmount(100000L)
-                .adminFee(5000)
                 .discount(5000L)
                 .sessionId(uuid)
                 .build();

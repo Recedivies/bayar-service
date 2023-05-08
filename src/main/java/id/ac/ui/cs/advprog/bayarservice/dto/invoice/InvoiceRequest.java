@@ -38,7 +38,6 @@ public class InvoiceRequest {
             entity.setPaymentMethod(PaymentMethod.valueOf(this.paymentMethod));
         }
         entity.setTotalAmount(this.totalAmount);
-        entity.setAdminFee(this.adminFee);
 
         return entity;
     }
