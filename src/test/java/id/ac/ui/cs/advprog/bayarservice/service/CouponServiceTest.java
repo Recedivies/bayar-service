@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -196,5 +197,12 @@ class CouponServiceTest {
     void whenDeleteCouponAndNotFoundByIdShouldThrowException() {
         when(couponRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
         Assertions.assertThrows(CouponDoesNotExistException.class, () -> couponService.deleteCoupon(1));
+    }
+
+    @Test
+    void whenGetAllCouponShouldReturnAllCoupon() {
+        when(couponRepository.findAll()).thenReturn(List.of(coupon));
+        List<Coupon> result = couponService.getAllCoupon();
+        Assertions.assertEquals(List.of(coupon), result);
     }
 }

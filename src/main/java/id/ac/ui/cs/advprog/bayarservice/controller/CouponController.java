@@ -52,4 +52,11 @@ public class CouponController {
                 "Success deleted coupon", HttpStatus.OK, SUCCESS, null)
         );
     }
+
+    @GetMapping("/coupons/getAll")
+    public ResponseEntity<Object> getAllCoupon() {
+        return ResponseHandler.generateResponse( new Response(
+                "Success retrieved all coupons", HttpStatus.OK, SUCCESS, couponService.getAllCoupon()
+        ));
+    }
 }
