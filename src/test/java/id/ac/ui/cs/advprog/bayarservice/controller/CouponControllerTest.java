@@ -17,6 +17,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
@@ -256,5 +258,25 @@ class CouponControllerTest {
                 .andDo(print());
 
         verify(couponService, atLeastOnce()).deleteCoupon(any(Integer.class));
+    }
+
+    @Test
+    void testGetAllCouponShouldReturn200OK() throws Exception {
+        String requestURI = END_POINT_PATH + "coupons/getAll";
+
+        List<Coupon> couponList = new ArrayList<>();
+        couponList.add(coupon);
+
+        when(couponService.getAllCoupon()).thenReturn(couponList);
+
+        mockMvc.perform(get(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("getAllCoupon"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.content[0].name").value(coupon.getName()))
+                .andDo(print());
+
+        verify(couponService, atLeastOnce()).getAllCoupon();
     }
 }

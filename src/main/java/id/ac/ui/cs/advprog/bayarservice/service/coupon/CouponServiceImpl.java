@@ -12,6 +12,8 @@ import id.ac.ui.cs.advprog.bayarservice.repository.CouponRepository;
 import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -82,6 +84,12 @@ public class CouponServiceImpl implements  CouponService {
             throw new CouponDoesNotExistException(id);
         }
         this.couponRepository.deleteById(id);
+    }
+
+
+    @Override
+    public List<Coupon> getAllCoupon() {
+        return this.couponRepository.findAll();
     }
 
     private boolean isCouponAlreadyExist(String name) {
