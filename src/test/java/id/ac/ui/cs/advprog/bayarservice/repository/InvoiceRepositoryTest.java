@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class InvoiceRepositoryTest {
+class InvoiceRepositoryTest {
 
     @MockBean
     private BillRepository billRepository;
@@ -37,7 +37,6 @@ public class InvoiceRepositoryTest {
                 .paymentMethod(PaymentMethod.CASH)
                 .paymentStatus(PaymentStatus.UNPAID)
                 .totalAmount(100000L)
-                .adminFee(5000)
                 .discount(5000L)
                 .sessionId(uuid)
                 .build();

@@ -1,6 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
-import id.ac.ui.cs.advprog.bayarservice.dto.Bank.BankRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.bank.BankRequest;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.service.bank.BankService;
 import id.ac.ui.cs.advprog.bayarservice.util.Response;
@@ -35,21 +35,15 @@ public class BankController {
         return ResponseEntity.ok(bank);
     }
 
-    @DeleteMapping("/banks/delete/{bank_id}")
-    public ResponseEntity<String> deleteBankById(@PathVariable Integer bank_id) {
-        if (bankService.findById(bank_id) == null) {
-            return ResponseEntity.notFound().build();
-        }
-        bankService.deleteById(bank_id);
-        return ResponseEntity.ok(String.format("Deleted Bank with id %d", bank_id));
+    @DeleteMapping("/banks/delete/{bankId}")
+    public ResponseEntity<String> deleteBankById(@PathVariable Integer bankId) {
+        bankService.deleteById(bankId);
+        return ResponseEntity.ok(String.format("Deleted Bank with id %d", bankId));
     }
 
-    @PutMapping("banks/update/{bank_id}")
-    public ResponseEntity<Bank> updateBankById(@PathVariable Integer bank_id, @RequestBody BankRequest request) {
-        Bank bank = bankService.update(bank_id, request);
-        if (bank == null) {
-            return ResponseEntity.notFound().build();
-        }
+    @PutMapping("banks/update/{bankId}")
+    public ResponseEntity<Bank> updateBankById(@PathVariable Integer bankId, @RequestBody BankRequest request) {
+        Bank bank = bankService.update(bankId, request);
         return ResponseEntity.ok(bank);
     }
 }

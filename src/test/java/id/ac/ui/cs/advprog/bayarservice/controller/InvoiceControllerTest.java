@@ -1,8 +1,8 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
-import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
-import id.ac.ui.cs.advprog.bayarservice.exception.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.dto.invoice.InvoiceRequest;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import id.ac.ui.cs.advprog.bayarservice.service.invoice.InvoiceServiceImpl;
@@ -37,7 +37,6 @@ class InvoiceControllerTest {
         Invoice invoice = Invoice.builder()
                 .id(1)
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -60,7 +59,7 @@ class InvoiceControllerTest {
     }
 
     @Test
-    public void testAddInvoiceShouldReturn400BadRequest() throws Exception {
+    void testAddInvoiceShouldReturn400BadRequest() throws Exception {
         Invoice invoice = Invoice.builder().build();
 
         String requestBody = Util.mapToJson(invoice);
@@ -75,7 +74,7 @@ class InvoiceControllerTest {
     }
 
     @Test
-    public void testAddInvoiceShouldReturn405MethodNotAllowed() throws Exception {
+    void testAddInvoiceShouldReturn405MethodNotAllowed() throws Exception {
         Invoice invoice = Invoice.builder().build();
 
         String requestBody = Util.mapToJson(invoice);
@@ -96,7 +95,6 @@ class InvoiceControllerTest {
         Invoice invoice = Invoice.builder()
                 .id(invoiceId)
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -151,7 +149,6 @@ class InvoiceControllerTest {
         Invoice invoice = Invoice.builder()
                 .sessionId(sessionId)
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())

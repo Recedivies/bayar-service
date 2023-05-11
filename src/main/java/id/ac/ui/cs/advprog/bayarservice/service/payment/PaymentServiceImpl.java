@@ -1,98 +1,127 @@
 package id.ac.ui.cs.advprog.bayarservice.service.payment;
 
 import id.ac.ui.cs.advprog.bayarservice.core.*;
+import id.ac.ui.cs.advprog.bayarservice.dto.payment.DetailPaymentLogResponse;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
-import id.ac.ui.cs.advprog.bayarservice.exception.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.PaymentLogDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyPaidException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentStatus;
-import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentHistory;
+import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentLog;
+import id.ac.ui.cs.advprog.bayarservice.repository.BankRepository;
 import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import id.ac.ui.cs.advprog.bayarservice.repository.PaymentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import id.ac.ui.cs.advprog.bayarservice.rest.WarnetService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Service
-public class PaymentServiceImpl implements Payment {
-
+@RequiredArgsConstructor
+public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
 
     private final InvoiceRepository invoiceRepository;
 
+    private final BankRepository bankRepository;
+
     private final PaymentReceiver paymentReceiver;
 
-    @Autowired
-    public PaymentServiceImpl(
-                              PaymentRepository paymentRepository,
-                              InvoiceRepository invoiceRepository,
-                              PaymentReceiver paymentReceiver
-    ) {
-        this.paymentRepository = paymentRepository;
-        this.invoiceRepository = invoiceRepository;
-        this.paymentReceiver = paymentReceiver;
-    }
+    private final WarnetService warnetService;
 
     public List<String> getPaymentMethods() {
         return Stream.of(PaymentMethod.values())
                                             .map(PaymentMethod::name)
-                                            .collect(Collectors.toList());
+                                            .toList();
     }
 
     @Override
-    public PaymentHistory create(Integer invoiceId, PaymentRequest request) {
+    public PaymentLog create(Integer invoiceId, PaymentRequest request) {
         Invoice invoice = this.invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new InvoiceDoesNotExistException(invoiceId));
+        if (invoice.getPaymentStatus().equals(PaymentStatus.PAID)) {
+            throw new InvoiceAlreadyPaidException(invoice.getSessionId());
+        }
 
-        long totalAmount = paymentReceiver.receive(request);
-
+        var session = this.warnetService.getSessionViaAPI(request.getSessionId());
+        var noPC = session.getPc().getNoPC();
+        long totalAmount = paymentReceiver.receive(request) - invoice.getDiscount();
         invoice.setPaymentStatus(PaymentStatus.PAID);
         invoice.setPaymentMethod(PaymentMethod.valueOf(request.getPaymentMethod()));
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
+        if (request.getBankId() != null) {
+            Bank bank = this.bankRepository.findById(request.getBankId())
+                    .orElseThrow(() -> new BankDoesNotExistException(request.getBankId()));
+            invoice.setBank(bank);
+        }
+
+        this.invoiceRepository.save(invoice);
+        PaymentLog paymentLog = PaymentLog.builder()
                 .sessionId(request.getSessionId())
-                .totalAmount(totalAmount)
+                .paymentMethod(PaymentMethod.valueOf(request.getPaymentMethod()))
+                .noPC(noPC)
+                .totalAmount(totalAmount < 0 ? 0 : totalAmount)
                 .invoice(invoice)
                 .build();
-        return this.paymentRepository.save(paymentHistory);
+        return this.paymentRepository.save(paymentLog);
     }
 
     @Override
-    public List<PaymentHistory> getPaymentLog() {
+    public List<PaymentLog> getPaymentLog() {
         return this.paymentRepository.findAll();
     }
 
     @Override
-    public List<PaymentHistory> getPaymentLogByYearAndMonth(int year, int month) {
-        List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
+    public List<PaymentLog> getPaymentLogByYearAndMonth(int year, int month) {
+        List<PaymentLog> paymentHistories = this.paymentRepository.findAll();
         return paymentHistories.stream()
                 .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year &&
                         paymentHistory.getCreatedAt().toLocalDate().getMonthValue() == month)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
-    public List<PaymentHistory> getPaymentLogByYear(int year) {
-        List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
+    public List<PaymentLog> getPaymentLogByYear(int year) {
+        List<PaymentLog> paymentHistories = this.paymentRepository.findAll();
         return paymentHistories.stream()
                 .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
-    public List<PaymentHistory> getPaymentLogByWeekAndYear(int year, int week) {
-        List<PaymentHistory> paymentHistories = this.paymentRepository.findAll();
+    public List<PaymentLog> getPaymentLogByWeekAndYear(int year, int week) {
+        List<PaymentLog> paymentHistories = this.paymentRepository.findAll();
         return paymentHistories.stream()
                 .filter(paymentHistory -> paymentHistory.getCreatedAt().toLocalDate().getYear() == year &&
                         paymentHistory.getCreatedAt().toLocalDate().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()) == week)
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    @Override
+    public DetailPaymentLogResponse getPaymentLogDetail(UUID sessionId) {
+        PaymentLog paymentLog = this.paymentRepository.findBySessionId(sessionId)
+                .orElseThrow(() -> new PaymentLogDoesNotExistException(sessionId));
+        Invoice invoice = this.invoiceRepository.findBySessionId(sessionId).
+                orElseThrow(() -> new InvoiceDoesNotExistException(sessionId));
+
+        Bank bank = null;
+        if (invoice.getPaymentMethod().equals(PaymentMethod.BANK)) {
+            bank = invoice.getBank();
+        }
+
+        return DetailPaymentLogResponse.builder()
+                .paymentLog(paymentLog)
+                .invoice(invoice)
+                .bank(bank)
+                .build();
     }
 }

@@ -3,13 +3,20 @@ plugins {
     id 'org.springframework.boot' version '3.0.4'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'jacoco'
-    id "org.sonarqube" version "3.5.0.2730"
+    id "org.sonarqube" version "4.0.0.2929"
 }
 
 sonarqube {
     properties {
         property "sonar.projectKey", "8275"
         property "sonar.organization", "bayar-service"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.login", System.getenv("SONAR_TOKEN")
+        property "sonar.branch.name", System.getenv("CI_COMMIT_BRANCH")
+        property "sonar.scm.disabled", "true"
+        property "sonar.coverage.exclusions", "**/**Application**, **/exceptions/**, **/rest/**"
+        property "sonar.exclusions", "src/test/java/**, src/**/*Application**, src/**/dto/**, src/**/exception/**, src/**/model/**, src/**/util/**, src/**/rest/**"
+        property "sonar.test.exclusions", "src/**/*Application**, src/**/dto/**, src/**/exception/**, src/**/model/**, src/**/util/**, src/**/rest/**"
     }
 }
 
@@ -31,6 +38,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
@@ -48,12 +56,12 @@ tasks.test {
 tasks.jacocoTestReport {
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['**/*Application**', '**/dto/**', '**/exception/**', '**/model/**', '**/util/**'])
+            fileTree(dir: it, exclude: ['**/*Application**', '**/dto/**', '**/exception/**', '**/model/**', '**/util/**', '**/rest/**'])
         }))
     }
     dependsOn(tasks.test) // tests are required to run before generating the report
     reports {
-        xml.required.set(false)
+        xml.required.set(true)
         csv.required.set(false)
         html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }

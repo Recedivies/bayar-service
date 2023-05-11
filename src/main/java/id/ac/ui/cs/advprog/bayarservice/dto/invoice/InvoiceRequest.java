@@ -1,4 +1,4 @@
-package id.ac.ui.cs.advprog.bayarservice.dto.Invoice;
+package id.ac.ui.cs.advprog.bayarservice.dto.invoice;
 
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
@@ -24,7 +24,6 @@ public class InvoiceRequest {
     private Integer adminFee;
 
     @Min(0)
-    @NotNull(message = "totalAmount is mandatory")
     private Long totalAmount;
 
     @Min(0)
@@ -39,7 +38,6 @@ public class InvoiceRequest {
             entity.setPaymentMethod(PaymentMethod.valueOf(this.paymentMethod));
         }
         entity.setTotalAmount(this.totalAmount);
-        entity.setAdminFee(this.adminFee);
 
         return entity;
     }

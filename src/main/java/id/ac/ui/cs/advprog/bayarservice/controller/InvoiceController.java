@@ -1,6 +1,6 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
-import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.invoice.InvoiceRequest;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.service.invoice.InvoiceService;
 import id.ac.ui.cs.advprog.bayarservice.util.Response;
@@ -19,12 +19,13 @@ import java.util.UUID;
 public class InvoiceController {
 
     private final InvoiceService invoiceService;
+    private static final String SUCCESS = "SUCCESS";
 
     @GetMapping("/invoices/id/{invoiceId}")
     public ResponseEntity<Object> getInvoiceById(@PathVariable Integer invoiceId) {
         Invoice response = invoiceService.findById(invoiceId);
         return ResponseHandler.generateResponse(new Response(
-                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+                "Success retrieved data", HttpStatus.OK, SUCCESS, response)
         );
     }
 
@@ -32,7 +33,7 @@ public class InvoiceController {
     public ResponseEntity<Object> getInvoiceBySessionId(@PathVariable UUID sessionId) {
         Invoice response = invoiceService.findBySessionId(sessionId);
         return ResponseHandler.generateResponse(new Response(
-                "Success retrieved data", HttpStatus.OK, "SUCCESS", response)
+                "Success retrieved data", HttpStatus.OK, SUCCESS, response)
         );
     }
 
@@ -40,7 +41,7 @@ public class InvoiceController {
     public ResponseEntity<Object> addInvoice(@RequestBody @Valid InvoiceRequest request) {
         Invoice invoice = invoiceService.create(request);
         return ResponseHandler.generateResponse(new Response(
-                "Success created invoice", HttpStatus.CREATED, "SUCCESS", invoice)
+                "Success created invoice", HttpStatus.CREATED, SUCCESS, invoice)
         );
     }
 }

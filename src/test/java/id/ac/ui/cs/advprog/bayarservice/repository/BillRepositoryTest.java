@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class BillRepositoryTest {
+class BillRepositoryTest {
 
     @Autowired
     private BillRepository billRepository;
@@ -33,7 +33,6 @@ public class BillRepositoryTest {
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
                 .paymentStatus(PaymentStatus.UNPAID)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(uuid)
@@ -41,7 +40,6 @@ public class BillRepositoryTest {
         invoiceRepository.save(invoice);
 
         bill = Bill.builder()
-                .id(1)
                 .name("Coffee")
                 .quantity(5)
                 .price(10000)

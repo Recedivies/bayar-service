@@ -1,7 +1,8 @@
 package id.ac.ui.cs.advprog.bayarservice.service;
 
-import id.ac.ui.cs.advprog.bayarservice.dto.Invoice.InvoiceRequest;
-import id.ac.ui.cs.advprog.bayarservice.exception.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.dto.invoice.InvoiceRequest;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
@@ -23,7 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class InvoiceServiceTest {
+class InvoiceServiceTest {
 
     @InjectMocks
     private InvoiceServiceImpl invoiceService;
@@ -37,14 +38,12 @@ public class InvoiceServiceTest {
     Bill newBill;
     InvoiceRequest createRequest;
     InvoiceRequest updateRequest;
+    UUID uuid;
 
     @BeforeEach
     void setUp() {
         createRequest = InvoiceRequest.builder()
-                .paymentMethod(String.valueOf(PaymentMethod.CASH))
-                .totalAmount(100000L)
-                .adminFee(5000)
-                .discount(5000L)
+                .sessionId(uuid)
                 .build();
 
         updateRequest = InvoiceRequest.builder()
@@ -56,18 +55,14 @@ public class InvoiceServiceTest {
 
         invoice = Invoice.builder()
                 .id(1)
-                .paymentMethod(PaymentMethod.CASH)
+                .sessionId(uuid)
                 .paymentStatus(PaymentStatus.UNPAID)
-                .totalAmount(100000L)
-                .adminFee(5000)
-                .discount(5000L)
                 .build();
 
         newInvoice = Invoice.builder()
                 .id(1)
                 .paymentMethod(PaymentMethod.CASH)
                 .totalAmount(210000L)
-                .adminFee(20000)
                 .discount(10000L)
                 .build();
 
@@ -84,6 +79,8 @@ public class InvoiceServiceTest {
                 .price(20000)
                 .subTotal(200000L)
                 .build();
+
+         uuid = UUID.randomUUID();
     }
 
     @Test
@@ -98,6 +95,14 @@ public class InvoiceServiceTest {
 
         verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
         Assertions.assertEquals(invoice, result);
+    }
+
+    @Test
+    void whenCreateInvoiceAndAlreadyExistShouldThrowException() {
+        when(invoiceRepository.findBySessionId(any())).thenReturn(Optional.of(invoice));
+
+        Assertions.assertThrows(InvoiceAlreadyExistException.class,
+                () -> invoiceService.create(createRequest));
     }
 
     @Test
@@ -127,7 +132,7 @@ public class InvoiceServiceTest {
     void whenFindBySessionIdAndFoundShouldReturnInvoice() {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
 
-        Invoice result = invoiceService.findBySessionId(UUID.randomUUID());
+        Invoice result = invoiceService.findBySessionId(uuid);
 
         verify(invoiceRepository, atLeastOnce()).findBySessionId(any(UUID.class));
         Assertions.assertEquals(invoice, result);
@@ -138,7 +143,7 @@ public class InvoiceServiceTest {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.empty());
 
         Assertions.assertThrows(InvoiceDoesNotExistException.class,
-                () -> invoiceService.findBySessionId(UUID.randomUUID()));
+                () -> invoiceService.findBySessionId(uuid));
     }
 }
 

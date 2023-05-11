@@ -1,7 +1,7 @@
 package id.ac.ui.cs.advprog.bayarservice.core;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
-import id.ac.ui.cs.advprog.bayarservice.exception.InvalidPaymentMethodException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvalidPaymentMethodException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

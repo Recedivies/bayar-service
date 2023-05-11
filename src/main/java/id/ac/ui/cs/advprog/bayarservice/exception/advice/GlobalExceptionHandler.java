@@ -4,6 +4,12 @@ import id.ac.ui.cs.advprog.bayarservice.exception.*;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyUsedException;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvalidPaymentMethodException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyPaidException;
+import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.warnet.SessionDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.warnet.WarnetServiceServerException;
 import id.ac.ui.cs.advprog.bayarservice.util.Response;
 import id.ac.ui.cs.advprog.bayarservice.util.ResponseHandler;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -17,20 +23,23 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final String FAILED = "FAILED";
 
     @ExceptionHandler(value = {
             BillDoesNotExistException.class,
             BankDoesNotExistException.class,
             InvoiceDoesNotExistException.class,
             CouponDoesNotExistException.class,
+            SessionDoesNotExistException.class,
+            PaymentLogDoesNotExistException.class
     })
     public ResponseEntity<Object> notAvailableHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
-                exception.getMessage(), HttpStatus.NOT_FOUND, "FAILED", null)
+                exception.getMessage(), HttpStatus.NOT_FOUND, FAILED, null)
         );
     }
 
@@ -39,17 +48,18 @@ public class GlobalExceptionHandler {
             InvalidPaymentMethodException.class,
             HttpMessageNotReadableException.class,
             CouponAlreadyUsedException.class,
+            InvoiceAlreadyPaidException.class
     })
     public ResponseEntity<Object> badRequestHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
-                exception.getMessage(), HttpStatus.BAD_REQUEST, "FAILED", null)
+                exception.getMessage(), HttpStatus.BAD_REQUEST, FAILED, null)
         );
     }
 
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Object> methodNotAllowed(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
-                exception.getMessage(), HttpStatus.METHOD_NOT_ALLOWED, "FAILED", null)
+                exception.getMessage(), HttpStatus.METHOD_NOT_ALLOWED, FAILED, null)
         );
     }
 
@@ -58,27 +68,28 @@ public class GlobalExceptionHandler {
         List<String> errors = exception.getBindingResult().getFieldErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.toList());
+                .toList();
 
         return ResponseHandler.generateResponse(new Response(
-                "validation error", HttpStatus.BAD_REQUEST, "FAILED", errors)
+                "validation error", HttpStatus.BAD_REQUEST, FAILED, errors)
         );
     }
 
-    @ExceptionHandler(value = {Exception.class})
+    @ExceptionHandler(value = {Exception.class, WarnetServiceServerException.class})
     public ResponseEntity<Object> generalError(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
-                exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "FAILED", null)
+                exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, FAILED, null)
         );
     }
 
     @ExceptionHandler(value = {
             BankAlreadyExistsException.class,
             CouponAlreadyExistException.class,
+            InvoiceAlreadyExistException.class
     })
     public ResponseEntity<Object> alreadyExistResourceException(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
-                exception.getMessage(), HttpStatus.CONFLICT, "FAILED", null)
+                exception.getMessage(), HttpStatus.CONFLICT, FAILED, null)
         );
     }
 }

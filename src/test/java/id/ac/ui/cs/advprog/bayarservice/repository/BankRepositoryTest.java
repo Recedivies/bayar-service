@@ -14,14 +14,15 @@ import java.util.Optional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class BankRepositoryTest {
+class BankRepositoryTest {
     @Autowired
     private BankRepository bankRepository;
 
+    Bank bank;
+
     @BeforeEach
     void setUp() {
-        Bank bank = Bank.builder()
-                .id(1)
+        bank = Bank.builder()
                 .name("Bank BCA")
                 .adminFee(5000)
                 .build();
@@ -42,7 +43,7 @@ public class BankRepositoryTest {
 
     @Test
     void testFindByIdOrFindByName() {
-        Optional<Bank> optionalBank = bankRepository.findById(1);
+        Optional<Bank> optionalBank = bankRepository.findById(bank.getId());
         Optional<Bank> optionalBank2 = bankRepository.findByName("Bank BCA");
 
         Assertions.assertTrue(optionalBank.isPresent());

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
-import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentHistory;
+import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentLog;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -43,11 +43,8 @@ public class Invoice {
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP WITH TIME ZONE default CURRENT_TIMESTAMP")
     private Date createdAt;
 
-    @Column(nullable = false)
-    private Long totalAmount;
-
-    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
-    private Integer adminFee = 0;
+    @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    private Long totalAmount = 0L;
 
     @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
     private Long discount = 0L;
@@ -59,7 +56,7 @@ public class Invoice {
     @JsonManagedReference
     @JsonIgnore
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)
-    private List<PaymentHistory> paymentHistories;
+    private List<PaymentLog> paymentHistories;
 
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)

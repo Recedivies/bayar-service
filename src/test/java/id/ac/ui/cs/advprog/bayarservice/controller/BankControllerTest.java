@@ -1,11 +1,11 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
-import id.ac.ui.cs.advprog.bayarservice.dto.Bank.BankRequest;
+import id.ac.ui.cs.advprog.bayarservice.dto.bank.BankRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.BankAlreadyExistsException;
-import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.service.bank.BankServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = BankController.class)
 @AutoConfigureMockMvc
-public class BankControllerTest {
+class BankControllerTest {
     private static final String END_POINT_PATH = "/api/v1/";
 
     @Autowired
@@ -31,6 +31,21 @@ public class BankControllerTest {
 
     @MockBean
     private BankServiceImpl bankService;
+
+    Bank bank;
+
+    BankRequest bankRequest;
+
+    @BeforeEach
+    void setUp() {
+        bank = Bank.builder()
+                .name("BCA")
+                .adminFee(6500)
+                .build();
+
+        bankRequest = BankRequest.builder()
+                .build();
+    }
 
     @Test
     void testGetBankShouldReturn200OK() throws Exception {
@@ -205,18 +220,21 @@ public class BankControllerTest {
     }
 
     @Test
-    void testDeleteBankByIdShouldReturn404NotFound() throws Exception {
-        int bankId = 1;
-        String requestURI = END_POINT_PATH + "banks/delete/" + bankId;
+    void testUpdateBankShouldReturn200OK() throws Exception {
+        int bankId = 123;
+        String requestURI = END_POINT_PATH + "banks/update/" + bankId;
 
-        when(bankService.findById(bankId)).thenThrow(BankDoesNotExistException.class);
+        when(bankService.update(any(Integer.class), any(BankRequest.class))).thenReturn(bank);
 
-        mockMvc.perform(delete(requestURI))
-                .andExpect(status().isNotFound())
-                .andExpect(handler().methodName("deleteBankById"))
-                .andExpect(jsonPath("$.status").value("FAILED"))
+        String requestBody = Util.mapToJson(bankRequest);
+
+        mockMvc.perform(put(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("updateBankById"))
                 .andDo(print());
 
-        verify(bankService, atMostOnce()).deleteById(bankId);
+        verify(bankService, atLeastOnce()).update(any(Integer.class), any(BankRequest.class));
     }
 }

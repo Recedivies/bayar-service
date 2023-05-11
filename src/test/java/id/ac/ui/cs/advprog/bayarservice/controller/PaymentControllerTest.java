@@ -1,10 +1,12 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
+import id.ac.ui.cs.advprog.bayarservice.dto.payment.DetailPaymentLogResponse;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
+import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.PaymentMethod;
-import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentHistory;
+import id.ac.ui.cs.advprog.bayarservice.model.payment.PaymentLog;
 import id.ac.ui.cs.advprog.bayarservice.service.payment.PaymentServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +59,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -69,13 +70,13 @@ class PaymentControllerTest {
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
                 .build();
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
+        PaymentLog paymentLog = PaymentLog.builder()
                 .totalAmount(100000L)
                 .sessionId(UUID.randomUUID())
                 .invoice(invoice)
                 .build();
 
-        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentLog);
 
         String requestBody = Util.mapToJson(paymentRequest);
 
@@ -95,8 +96,8 @@ class PaymentControllerTest {
         int invoiceId = 123;
         String requestURI = END_POINT_PATH + "/invoices/" + invoiceId + "/payments";
 
-        PaymentHistory paymentHistory = PaymentHistory.builder().build();
-        String requestBody = Util.mapToJson(paymentHistory);
+        PaymentLog paymentLog = PaymentLog.builder().build();
+        String requestBody = Util.mapToJson(paymentLog);
 
         mockMvc.perform(post(requestURI)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -119,13 +120,12 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentShouldReturn200OK() throws Exception {
+    void testGetLogPaymentShouldReturn200OK() throws Exception {
         int invoiceId = 123;
         String requestURI = END_POINT_PATH + "/log/paymentLog";
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -137,14 +137,14 @@ class PaymentControllerTest {
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
                 .build();
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
+        PaymentLog paymentLog = PaymentLog.builder()
                 .totalAmount(100000L)
                 .sessionId(UUID.randomUUID())
                 .createdAt(new Date(Instant.now().toEpochMilli()))
                 .invoice(invoice)
                 .build();
 
-        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentLog);
 
         String requestBody = Util.mapToJson(paymentRequest);
 
@@ -158,7 +158,7 @@ class PaymentControllerTest {
 
         verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
 
-        when(paymentService.getPaymentLog()).thenReturn(List.of(paymentHistory));
+        when(paymentService.getPaymentLog()).thenReturn(List.of(paymentLog));
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isOk())
@@ -168,7 +168,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentShouldReturn405MethodNotAllowed() throws Exception {
+    void testGetLogPaymentShouldReturn405MethodNotAllowed() throws Exception {
         String requestURI = END_POINT_PATH + "/log/paymentLog";
 
         mockMvc.perform(post(requestURI))
@@ -187,7 +187,7 @@ class PaymentControllerTest {
                 .andDo(print());
     }
     @Test
-    public void testGetLogPaymentByYearAndMonthShouldReturn200OK() throws Exception {
+    void testGetLogPaymentByYearAndMonthShouldReturn200OK() throws Exception {
         int invoiceId = 123;
         int year = LocalDate.now().getYear();
         int month = LocalDate.now().getMonthValue();
@@ -195,7 +195,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -207,7 +206,7 @@ class PaymentControllerTest {
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
                 .build();
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
+        PaymentLog paymentLog = PaymentLog.builder()
                 .totalAmount(100000L)
                 .sessionId(UUID.randomUUID())
                 .createdAt(new Date(Instant.now().toEpochMilli()))
@@ -215,7 +214,7 @@ class PaymentControllerTest {
                 .createdAt(new Date(Instant.now().toEpochMilli()))
                 .build();
 
-        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentLog);
 
         String requestBody = Util.mapToJson(paymentRequest);
 
@@ -229,7 +228,7 @@ class PaymentControllerTest {
 
         verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
 
-        when(paymentService.getPaymentLogByYearAndMonth(any(Integer.class), any(Integer.class))).thenReturn(List.of(paymentHistory));
+        when(paymentService.getPaymentLogByYearAndMonth(any(Integer.class), any(Integer.class))).thenReturn(List.of(paymentLog));
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isOk())
@@ -239,7 +238,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentByYearAndMonthShouldReturn405MethodNotAllowed() throws Exception {
+    void testGetLogPaymentByYearAndMonthShouldReturn405MethodNotAllowed() throws Exception {
         int year = LocalDate.now().getYear();
         int month = LocalDate.now().getMonthValue();
         String requestURI = END_POINT_PATH + "/log/paymentLog/monthly/" + year + "/" + month;
@@ -261,14 +260,13 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentByYearShouldReturn200K() throws Exception {
+    void testGetLogPaymentByYearShouldReturn200K() throws Exception {
         int invoiceId = 123;
         int year = LocalDate.now().getYear();
         String requestURI = END_POINT_PATH + "/log/paymentLog/" + year;
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -280,14 +278,14 @@ class PaymentControllerTest {
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
                 .build();
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
+        PaymentLog paymentLog = PaymentLog.builder()
                 .totalAmount(100000L)
                 .sessionId(UUID.randomUUID())
                 .createdAt(new Date(Instant.now().toEpochMilli()))
                 .invoice(invoice)
                 .build();
 
-        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentLog);
 
         String requestBody = Util.mapToJson(paymentRequest);
 
@@ -301,7 +299,7 @@ class PaymentControllerTest {
 
         verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
 
-        when(paymentService.getPaymentLogByYear(any(Integer.class))).thenReturn(List.of(paymentHistory));
+        when(paymentService.getPaymentLogByYear(any(Integer.class))).thenReturn(List.of(paymentLog));
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isOk())
@@ -311,7 +309,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentByYearShouldReturn405MethodNotAllowed() throws Exception {
+    void testGetLogPaymentByYearShouldReturn405MethodNotAllowed() throws Exception {
         int year = LocalDate.now().getYear();
         String requestURI = END_POINT_PATH + "/log/paymentLog/" + year;
 
@@ -332,7 +330,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentByWeekAndYearShouldReturn2000K () throws Exception {
+    void testGetLogPaymentByWeekAndYearShouldReturn2000K () throws Exception {
         int invoiceId = 123;
         int year = LocalDate.now().getYear();
         int week = LocalDate.now().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
@@ -340,7 +338,6 @@ class PaymentControllerTest {
 
         Invoice invoice = Invoice.builder()
                 .paymentMethod(PaymentMethod.CASH)
-                .adminFee(5000)
                 .totalAmount(100000L)
                 .discount(5000L)
                 .sessionId(UUID.randomUUID())
@@ -352,14 +349,14 @@ class PaymentControllerTest {
                 .paymentMethod(String.valueOf(PaymentMethod.CASH))
                 .build();
 
-        PaymentHistory paymentHistory = PaymentHistory.builder()
+        PaymentLog paymentLog = PaymentLog.builder()
                 .totalAmount(100000L)
                 .sessionId(UUID.randomUUID())
                 .createdAt(new Date(Instant.now().toEpochMilli()))
                 .invoice(invoice)
                 .build();
 
-        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentHistory);
+        when(paymentService.create(any(Integer.class), any(PaymentRequest.class))).thenReturn(paymentLog);
 
         String requestBody = Util.mapToJson(paymentRequest);
 
@@ -373,7 +370,7 @@ class PaymentControllerTest {
 
         verify(paymentService, atLeastOnce()).create(any(Integer.class), any(PaymentRequest.class));
 
-        when(paymentService.getPaymentLogByWeekAndYear(any(Integer.class), any(Integer.class))).thenReturn(List.of(paymentHistory));
+        when(paymentService.getPaymentLogByWeekAndYear(any(Integer.class), any(Integer.class))).thenReturn(List.of(paymentLog));
 
         mockMvc.perform(get(requestURI))
                 .andExpect(status().isOk())
@@ -383,7 +380,7 @@ class PaymentControllerTest {
     }
 
     @Test
-    public void testGetLogPaymentByWeekAndYearShouldReturn405MethodNotAllowed() throws Exception {
+    void testGetLogPaymentByWeekAndYearShouldReturn405MethodNotAllowed() throws Exception {
         int year = LocalDate.now().getYear();
         int week = LocalDate.now().get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear());
         String requestURI = END_POINT_PATH + "/log/paymentLog/weekly/" + year + "/" + week;
@@ -404,4 +401,43 @@ class PaymentControllerTest {
                 .andDo(print());
     }
 
+    @Test
+    void testGetPaymentLogDetailAndReturn200() throws Exception {
+        UUID sessionId = UUID.randomUUID();
+        String requestURI = END_POINT_PATH + "/log/paymentLog/detail/" + sessionId;
+
+        Invoice invoice = Invoice.builder()
+                .paymentMethod(PaymentMethod.CASH)
+                .totalAmount(100000L)
+                .discount(5000L)
+                .sessionId(UUID.randomUUID())
+                .build();
+
+        PaymentLog paymentLog = PaymentLog.builder()
+                .totalAmount(100000L)
+                .sessionId(UUID.randomUUID())
+                .invoice(invoice)
+                .build();
+
+
+        Bank bank = Bank.builder().build();
+
+        DetailPaymentLogResponse response =
+                DetailPaymentLogResponse.builder()
+                        .bank(bank)
+                        .invoice(invoice)
+                        .paymentLog(paymentLog)
+                        .build();
+
+        when(paymentService.getPaymentLogDetail(sessionId))
+                .thenReturn(response);
+
+        mockMvc.perform(get(requestURI))
+                .andExpect(status().isOk())
+                .andExpect(handler().methodName("getPaymentLogDetail"))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andDo(print());
+
+        verify(paymentService, atMostOnce()).getPaymentLogDetail(sessionId);
+    }
 }

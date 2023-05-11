@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class BankPaymentTest {
+class BankPaymentTest {
 
     @Autowired
     BankPayment bankPayment;
@@ -26,7 +26,6 @@ public class BankPaymentTest {
     @BeforeEach
     void setUp() {
         bank = Bank.builder()
-                .id(1)
                 .name("BNI")
                 .adminFee(5000)
                 .build();

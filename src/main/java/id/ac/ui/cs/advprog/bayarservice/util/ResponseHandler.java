@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ResponseHandler {
+//    create private constructor to prevent instantiation
+    private ResponseHandler() {
+    }
     public static ResponseEntity<Object> generateResponse(Response response) {
         Map<String, Object> map = new HashMap<>();
         map.put("message", response.getMessage());
