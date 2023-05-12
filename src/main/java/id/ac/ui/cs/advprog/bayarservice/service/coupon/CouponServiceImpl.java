@@ -12,6 +12,7 @@ import id.ac.ui.cs.advprog.bayarservice.repository.CouponRepository;
 import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,6 +25,18 @@ public class CouponServiceImpl implements  CouponService {
     public CouponServiceImpl(CouponRepository couponRepository, InvoiceRepository invoiceRepository) {
         this.couponRepository = couponRepository;
         this.invoiceRepository = invoiceRepository;
+    }
+
+    @Override
+    public List<Coupon> getAll() {
+        return this.couponRepository.findAll();
+    }
+
+    @Override
+    public List<Coupon> getAllAvailableCoupon() {
+        List<Coupon> coupons = this.couponRepository.findAll();
+        coupons.removeIf(Coupon::isUsed);
+        return coupons;
     }
 
     @Override

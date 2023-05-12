@@ -4,9 +4,12 @@ import id.ac.ui.cs.advprog.bayarservice.dto.coupon.CouponRequest;
 import id.ac.ui.cs.advprog.bayarservice.dto.coupon.UseCouponRequest;
 import id.ac.ui.cs.advprog.bayarservice.model.coupon.Coupon;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface CouponService {
+    List<Coupon> getAll();
+    List<Coupon> getAllAvailableCoupon();
     Coupon findById(Integer id);
     Coupon update(Integer id, CouponRequest request);
     void useCoupon(UUID id, UseCouponRequest request);

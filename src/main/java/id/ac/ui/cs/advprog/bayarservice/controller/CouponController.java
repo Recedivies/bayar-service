@@ -2,6 +2,7 @@ package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.coupon.CouponRequest;
 import id.ac.ui.cs.advprog.bayarservice.dto.coupon.UseCouponRequest;
+import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.model.coupon.Coupon;
 import id.ac.ui.cs.advprog.bayarservice.service.coupon.CouponService;
 import id.ac.ui.cs.advprog.bayarservice.util.Response;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,6 +22,22 @@ import java.util.UUID;
 public class CouponController {
     private final CouponService couponService;
     private static final String SUCCESS = "SUCCESS";
+
+    @GetMapping("/coupons")
+    public ResponseEntity<Object> getAllCoupons() {
+        List<Coupon> coupons = couponService.getAll();
+        return ResponseHandler.generateResponse(new Response(
+                "Success retrieved data", HttpStatus.OK, SUCCESS, coupons)
+        );
+    }
+
+    @GetMapping("/coupons/available")
+    public ResponseEntity<Object> getAllAvailableCoupons() {
+        List<Coupon> coupons = couponService.getAllAvailableCoupon();
+        return ResponseHandler.generateResponse(new Response(
+                "Success retrieved data", HttpStatus.OK, SUCCESS, coupons)
+        );
+    }
 
     @PutMapping("/coupons/{couponId}")
     public ResponseEntity<Object> updateCoupon(@PathVariable Integer couponId, @RequestBody @Valid CouponRequest request) {
