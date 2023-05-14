@@ -13,6 +13,7 @@ import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,15 +37,16 @@ public class CouponServiceImpl implements  CouponService {
 
     @Override
     public Coupon update(Integer id, CouponRequest request) {
-        if (isCouponAlreadyExist(request.getName())) {
+        Optional<Coupon> coupon = this.couponRepository.findByName(request.getName());
+        if (coupon.isPresent() && !Objects.equals(coupon.get().getId(), id)) {
             throw new CouponAlreadyExistException(request.getName());
         }
 
-        Coupon coupon = this.findById(id);
-        coupon.setName(request.getName());
-        coupon.setDiscount(request.getDiscount());
+        Coupon newCoupon = this.findById(id);
+        newCoupon.setName(request.getName());
+        newCoupon.setDiscount(request.getDiscount());
 
-        return this.couponRepository.save(coupon);
+        return this.couponRepository.save(newCoupon);
     }
 
     @Override
