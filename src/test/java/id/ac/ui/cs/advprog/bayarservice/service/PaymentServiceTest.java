@@ -5,7 +5,8 @@ import id.ac.ui.cs.advprog.bayarservice.dto.payment.DetailPaymentLogResponse;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
 import id.ac.ui.cs.advprog.bayarservice.dto.warnet.PCResponse;
 import id.ac.ui.cs.advprog.bayarservice.dto.warnet.SessionResponse;
-import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.bank.BankDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.bank.BankNotSelectedException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyPaidException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
@@ -177,11 +178,19 @@ class PaymentServiceTest {
     }
 
     @Test
+    void whenCreatePaymentAndBankNotSelectedAndPaymentMethodIsBankShouldReturn400BadRequest() {
+        createRequest.setPaymentMethod(String.valueOf(PaymentMethod.BANK));
+        when(invoiceRepository.findById(any())).thenReturn(Optional.of(invoice));
+
+        Assertions.assertThrows(BankNotSelectedException.class,
+                () -> paymentService.create(0, createRequest));
+    }
+
+    @Test
     void whenCreatePaymentShouldAndBankNotFoundReturn404NotFound() {
         createRequest.setPaymentMethod(String.valueOf(PaymentMethod.BANK));
         createRequest.setBankId(100);
         when(invoiceRepository.findById(any())).thenReturn(Optional.of(invoice));
-        when(warnetService.getSessionViaAPI(any())).thenReturn(sessionResponse);
         when(bankRepository.findById(any())).thenReturn(Optional.empty());
 
         Assertions.assertThrows(BankDoesNotExistException.class,

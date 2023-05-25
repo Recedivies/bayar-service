@@ -50,7 +50,7 @@ public class CouponServiceImpl implements  CouponService {
     }
 
     @Override
-    public void useCoupon(UUID sessionId, UseCouponRequest request) {
+    public synchronized void useCoupon(UUID sessionId, UseCouponRequest request) {
         Invoice invoice = this.invoiceRepository.findBySessionId(sessionId)
                 .orElseThrow(() -> new InvoiceDoesNotExistException(sessionId));
         Coupon coupon = this.couponRepository.findByName(request.getName())

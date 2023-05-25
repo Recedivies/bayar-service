@@ -3,8 +3,9 @@ package id.ac.ui.cs.advprog.bayarservice.service.payment;
 import id.ac.ui.cs.advprog.bayarservice.core.*;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.DetailPaymentLogResponse;
 import id.ac.ui.cs.advprog.bayarservice.dto.payment.PaymentRequest;
-import id.ac.ui.cs.advprog.bayarservice.exception.BankDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.bank.BankDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.PaymentLogDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.bank.BankNotSelectedException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceAlreadyPaidException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
@@ -51,18 +52,21 @@ public class PaymentServiceImpl implements PaymentService {
         if (invoice.getPaymentStatus().equals(PaymentStatus.PAID)) {
             throw new InvoiceAlreadyPaidException(invoice.getSessionId());
         }
+        if (request.getBankId() == null &&
+                PaymentMethod.valueOf(request.getPaymentMethod()) == PaymentMethod.BANK) {
+            throw new BankNotSelectedException();
+        }
+        if (request.getBankId() != null) {
+            Bank bank = this.bankRepository.findById(request.getBankId())
+                    .orElseThrow(() -> new BankDoesNotExistException(request.getBankId()));
+            invoice.setBank(bank);
+        }
 
         var session = this.warnetService.getSessionViaAPI(request.getSessionId());
         var noPC = session.getPc().getNoPC();
         long totalAmount = paymentReceiver.receive(request) - invoice.getDiscount();
         invoice.setPaymentStatus(PaymentStatus.PAID);
         invoice.setPaymentMethod(PaymentMethod.valueOf(request.getPaymentMethod()));
-
-        if (request.getBankId() != null) {
-            Bank bank = this.bankRepository.findById(request.getBankId())
-                    .orElseThrow(() -> new BankDoesNotExistException(request.getBankId()));
-            invoice.setBank(bank);
-        }
 
         this.invoiceRepository.save(invoice);
         PaymentLog paymentLog = PaymentLog.builder()
