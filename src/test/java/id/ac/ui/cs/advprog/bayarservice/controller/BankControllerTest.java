@@ -2,7 +2,7 @@ package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
 import id.ac.ui.cs.advprog.bayarservice.dto.bank.BankRequest;
-import id.ac.ui.cs.advprog.bayarservice.exception.BankAlreadyExistsException;
+import id.ac.ui.cs.advprog.bayarservice.exception.bank.BankAlreadyExistsException;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.service.bank.BankServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
