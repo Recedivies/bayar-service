@@ -1,6 +1,9 @@
 package id.ac.ui.cs.advprog.bayarservice.exception.advice;
 
 import id.ac.ui.cs.advprog.bayarservice.exception.*;
+import id.ac.ui.cs.advprog.bayarservice.exception.bank.BankAlreadyExistsException;
+import id.ac.ui.cs.advprog.bayarservice.exception.bank.BankDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.bank.BankNotSelectedException;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyExistException;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyUsedException;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponDoesNotExistException;
@@ -48,7 +51,8 @@ public class GlobalExceptionHandler {
             InvalidPaymentMethodException.class,
             HttpMessageNotReadableException.class,
             CouponAlreadyUsedException.class,
-            InvoiceAlreadyPaidException.class
+            InvoiceAlreadyPaidException.class,
+            BankNotSelectedException.class
     })
     public ResponseEntity<Object> badRequestHandler(Exception exception) {
         return ResponseHandler.generateResponse(new Response(
