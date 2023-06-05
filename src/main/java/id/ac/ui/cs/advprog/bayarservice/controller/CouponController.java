@@ -41,13 +41,10 @@ public class CouponController {
 
     @PostMapping("/coupons/createCoupon")
     public ResponseEntity<Object> createCoupon(@RequestBody @Valid CouponRequest request) {
-        if (request.getDiscount().toString().equals("") || request.getName().equals("")) {
+        if (request.getDiscount().toString().equals("") || request.getName().equals("") || request.getDiscount() < 0 ||
+            request.getDiscount().toString().matches("[a-zA-Z]+")) {
             return ResponseHandler.generateResponse(new Response(
-                    "Failed to create coupon, incomplete request", HttpStatus.BAD_REQUEST, FAILED, null)
-            );
-        } else if (request.getDiscount().toString().matches("[a-zA-Z]+") || request.getDiscount() < 0) {
-            return ResponseHandler.generateResponse(new Response(
-                    "Failed to create coupon, invalid discount", HttpStatus.BAD_REQUEST, FAILED, null)
+                    "Failed to create coupon", HttpStatus.BAD_REQUEST, FAILED, null)
             );
         } else {
             Coupon coupon = couponService.createCoupon(request);
