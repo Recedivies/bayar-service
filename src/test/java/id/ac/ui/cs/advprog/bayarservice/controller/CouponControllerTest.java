@@ -8,6 +8,7 @@ import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyExistExcep
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.coupon.Coupon;
 import id.ac.ui.cs.advprog.bayarservice.service.coupon.CouponServiceImpl;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -228,6 +229,10 @@ class CouponControllerTest {
                 .discount(-50000L)
                 .build();
 
+        JSONObject stringCouponDiscount = new JSONObject();
+        stringCouponDiscount.put("name", "SEPTEMBERCERIA");
+        stringCouponDiscount.put("discount", "abcdef");
+
         String requestBodyEmptyCouponName = Util.mapToJson(emptyCouponName);
 
         String requestBodyEmptyCouponDiscount = Util.mapToJson(emptyCouponDiscount);
@@ -257,6 +262,12 @@ class CouponControllerTest {
         mockMvc.perform(post(requestURI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyNegativeCouponDiscount))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(stringCouponDiscount.toString()))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
