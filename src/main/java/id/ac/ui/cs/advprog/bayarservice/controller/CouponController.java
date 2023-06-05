@@ -41,23 +41,17 @@ public class CouponController {
 
     @PostMapping("/coupons/createCoupon")
     public ResponseEntity<Object> createCoupon(@RequestBody @Valid CouponRequest request) {
-        if (request.getDiscount().toString().equals("") || request.getName().equals("") || request.getDiscount() < 0 ||
-            request.getDiscount().toString().matches("[a-zA-Z]+")) {
+        if (request.getName().equals("")) {
             return ResponseHandler.generateResponse(new Response(
-                    "Failed to create coupon", HttpStatus.BAD_REQUEST, FAILED, null)
-            );
-        } else {
-            Coupon coupon = couponService.createCoupon(request);
-            if (coupon == null) {
-                return ResponseHandler.generateResponse(new Response(
-                        "Failed to create coupon", HttpStatus.BAD_REQUEST, FAILED, null)
-                );
-            }
-            return ResponseHandler.generateResponse(new Response(
-                    "Success created coupon", HttpStatus.CREATED, SUCCESS, coupon)
+                    "Coupon Name Is Mandatory", HttpStatus.BAD_REQUEST, FAILED, null)
             );
         }
+        Coupon coupon = couponService.createCoupon(request);
+        return ResponseHandler.generateResponse(new Response(
+                "Success created coupon", HttpStatus.CREATED, SUCCESS, coupon)
+        );
     }
+
 
     @DeleteMapping("/coupons/delete/{couponId}")
     public ResponseEntity<Object> deleteCoupon(@PathVariable Integer couponId) {

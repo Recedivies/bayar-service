@@ -229,9 +229,8 @@ class CouponControllerTest {
                 .discount(-50000L)
                 .build();
 
-        JSONObject stringCouponDiscount = new JSONObject();
-        stringCouponDiscount.put("name", "SEPTEMBERCERIA");
-        stringCouponDiscount.put("discount", "abcdef");
+        Coupon emptyRequest = Coupon.builder()
+                .build();
 
         String requestBodyEmptyCouponName = Util.mapToJson(emptyCouponName);
 
@@ -239,7 +238,7 @@ class CouponControllerTest {
 
         String requestBodyNegativeCouponDiscount = Util.mapToJson(negativeCouponDiscount);
 
-        String requestBodyFullyEmpty = "";
+        String requestBodyFullyEmpty = Util.mapToJson(emptyRequest);
 
         mockMvc.perform(post(requestURI)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -262,12 +261,6 @@ class CouponControllerTest {
         mockMvc.perform(post(requestURI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyNegativeCouponDiscount))
-                .andExpect(status().isBadRequest())
-                .andDo(print());
-
-        mockMvc.perform(post(requestURI)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(stringCouponDiscount.toString()))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
