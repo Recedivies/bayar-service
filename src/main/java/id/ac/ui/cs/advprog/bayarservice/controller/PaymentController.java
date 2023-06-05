@@ -24,6 +24,8 @@ public class PaymentController {
     private static final String SUCCESS = "SUCCESS";
     private static final String RETRIEVED = "Success retrieved data";
 
+    private static final String ERROR = "ERROR";
+
     @GetMapping("/methods")
     public ResponseEntity<Object> getPaymentMethods() {
         List<String> response = paymentService.getPaymentMethods();
@@ -52,7 +54,7 @@ public class PaymentController {
     public ResponseEntity<Object> getPaymentLogByYearAndMonth(@PathVariable Integer year, @PathVariable Integer month) {
         if (year < 0 || month < 0 || month > 12) {
             return ResponseHandler.generateResponse(new Response(
-                    "Year must be greater than 0 and month must be between 1 and 12", HttpStatus.BAD_REQUEST, "ERROR", null)
+                    "Year must be greater than 0 and month must be between 1 and 12", HttpStatus.BAD_REQUEST, ERROR, null)
             );
         }
         List<PaymentLog> response = paymentService.getPaymentLogByYearAndMonth(year, month);
@@ -65,7 +67,7 @@ public class PaymentController {
     public ResponseEntity<Object> getPaymentLogByYear(@PathVariable Integer year) {
         if (year < 0) {
             return ResponseHandler.generateResponse(new Response(
-                    "Year must be greater than 0", HttpStatus.BAD_REQUEST, "ERROR", null)
+                    "Year must be greater than 0", HttpStatus.BAD_REQUEST, ERROR, null)
             );
         }
         List<PaymentLog> response = paymentService.getPaymentLogByYear(year);
@@ -78,7 +80,7 @@ public class PaymentController {
     public ResponseEntity<Object> getPaymentLogByWeekAndYear(@PathVariable Integer year, @PathVariable Integer week) {
         if (year < 0 || week < 0 || week > 52) {
             return ResponseHandler.generateResponse(new Response(
-                    "Year must be greater than 0 and week must be between 1 and 52", HttpStatus.BAD_REQUEST, "ERROR", null)
+                    "Year must be greater than 0 and week must be between 1 and 52", HttpStatus.BAD_REQUEST, ERROR, null)
             );
         }
         List<PaymentLog> response = paymentService.getPaymentLogByWeekAndYear(year, week);
