@@ -440,4 +440,93 @@ class PaymentControllerTest {
 
         verify(paymentService, atMostOnce()).getPaymentLogDetail(sessionId);
     }
+
+    @Test
+    void testGetPaymentLogYearlyShouldReturn400BadRequest() throws Exception {
+        String requestURINegative = END_POINT_PATH + "/log/paymentLog/-2000";
+
+        String requestURIString = END_POINT_PATH + "/log/paymentLog/abc";
+
+        mockMvc.perform(get(requestURINegative))
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().methodName("getPaymentLogByYear"))
+                .andExpect(jsonPath("$.status").value("ERROR"))
+                .andDo(print());
+
+        mockMvc.perform(get(requestURIString))
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().methodName("getPaymentLogByYear"))
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+    }
+
+    @Test
+    void testGetPaymentLogWeeklyShouldReturn400BadRequest() throws Exception {
+        String requestURINegativeYear = END_POINT_PATH + "/log/paymentLog/weekly/-2000/1";
+
+        String requestURINegativeWeek = END_POINT_PATH + "/log/paymentLog/weekly/2000/-1";
+
+        String requestURIString = END_POINT_PATH + "/log/paymentLog/weekly/abc/1";
+
+        String requestURIOutOfRangeWeek = END_POINT_PATH + "/log/paymentLog/weekly/2000/100";
+
+        mockMvc.perform(get(requestURINegativeYear))
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().methodName("getPaymentLogByWeekAndYear"))
+                .andExpect(jsonPath("$.status").value("ERROR"))
+                .andDo(print());
+
+        mockMvc.perform(get(requestURIString))
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().methodName("getPaymentLogByWeekAndYear"))
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(get(requestURINegativeWeek))
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().methodName("getPaymentLogByWeekAndYear"))
+                .andExpect(jsonPath("$.status").value("ERROR"))
+                .andDo(print());
+
+        mockMvc.perform(get(requestURIOutOfRangeWeek))
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().methodName("getPaymentLogByWeekAndYear"))
+                .andExpect(jsonPath("$.status").value("ERROR"))
+                .andDo(print());
+    }
+
+    @Test
+    void testGetPaymentLogMonthlyShouldReturn400BadRequest() throws Exception {
+        String requestURINegativeYear = END_POINT_PATH + "/log/paymentLog/monthly/-2000/1";
+
+        String requestURINegativeMonth = END_POINT_PATH + "/log/paymentLog/monthly/2000/-1";
+
+        String requestURIString = END_POINT_PATH + "/log/paymentLog/monthly/abc/1";
+
+        String requestURIOutOfRangeMonth = END_POINT_PATH + "/log/paymentLog/monthly/2000/13";
+
+        mockMvc.perform(get(requestURINegativeYear))
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().methodName("getPaymentLogByYearAndMonth"))
+                .andExpect(jsonPath("$.status").value("ERROR"))
+                .andDo(print());
+
+        mockMvc.perform(get(requestURIString))
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().methodName("getPaymentLogByYearAndMonth"))
+                .andExpect(jsonPath("$.status").value("FAILED"))
+                .andDo(print());
+
+        mockMvc.perform(get(requestURINegativeMonth))
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().methodName("getPaymentLogByYearAndMonth"))
+                .andExpect(jsonPath("$.status").value("ERROR"))
+                .andDo(print());
+
+        mockMvc.perform(get(requestURIOutOfRangeMonth))
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().methodName("getPaymentLogByYearAndMonth"))
+                .andExpect(jsonPath("$.status").value("ERROR"))
+                .andDo(print());
+    }
 }

@@ -50,6 +50,11 @@ public class PaymentController {
 
     @GetMapping("/log/paymentLog/monthly/{year}/{month}")
     public ResponseEntity<Object> getPaymentLogByYearAndMonth(@PathVariable Integer year, @PathVariable Integer month) {
+        if (year < 0 || month < 0 || month > 12) {
+            return ResponseHandler.generateResponse(new Response(
+                    "Year must be greater than 0 and month must be between 1 and 12", HttpStatus.BAD_REQUEST, "ERROR", null)
+            );
+        }
         List<PaymentLog> response = paymentService.getPaymentLogByYearAndMonth(year, month);
         return ResponseHandler.generateResponse(new Response(
                 RETRIEVED, HttpStatus.OK, SUCCESS, response)
@@ -58,6 +63,11 @@ public class PaymentController {
 
     @GetMapping("/log/paymentLog/{year}")
     public ResponseEntity<Object> getPaymentLogByYear(@PathVariable Integer year) {
+        if (year < 0) {
+            return ResponseHandler.generateResponse(new Response(
+                    "Year must be greater than 0", HttpStatus.BAD_REQUEST, "ERROR", null)
+            );
+        }
         List<PaymentLog> response = paymentService.getPaymentLogByYear(year);
         return ResponseHandler.generateResponse(new Response(
                 RETRIEVED, HttpStatus.OK, SUCCESS, response)
@@ -66,6 +76,11 @@ public class PaymentController {
 
     @GetMapping("/log/paymentLog/weekly/{year}/{week}")
     public ResponseEntity<Object> getPaymentLogByWeekAndYear(@PathVariable Integer year, @PathVariable Integer week) {
+        if (year < 0 || week < 0 || week > 52) {
+            return ResponseHandler.generateResponse(new Response(
+                    "Year must be greater than 0 and week must be between 1 and 52", HttpStatus.BAD_REQUEST, "ERROR", null)
+            );
+        }
         List<PaymentLog> response = paymentService.getPaymentLogByWeekAndYear(year, week);
         return ResponseHandler.generateResponse(new Response(
                 RETRIEVED, HttpStatus.OK, SUCCESS, response)

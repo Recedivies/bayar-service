@@ -26,11 +26,25 @@ public class BillController {
 
     @PostMapping("/bills")
     public ResponseEntity<Bill> addBillToInvoice(@RequestBody BillRequest request) {
-        Bill response = billService.create(request);
-        if (response == null) {
+        if (
+                request.getName() == null ||
+                request.getName().equals("") ||
+                request.getQuantity() == null ||
+                request.getPrice() == null ||
+                request.getSubTotal() == null ||
+                request.toString().equals("") ||
+                request.getPrice() < 0 ||
+                request.getQuantity() < 1 ||
+                request.getSubTotal() < 0
+        ) {
             return ResponseEntity.badRequest().build();
+        } else {
+            Bill response = billService.create(request);
+            if (response == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            return ResponseEntity.ok(response);
         }
-        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/bills/delete/{billId}")

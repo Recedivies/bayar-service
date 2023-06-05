@@ -101,17 +101,46 @@ class BankControllerTest {
     void testCreateBankShouldReturn400BadRequest () throws Exception {
         String requestURI = END_POINT_PATH + "addBank";
 
-        Bank bank = Bank.builder().build();
+        Bank bankFullyEmpty = Bank.builder().build();
 
-        String requestBody = Util.mapToJson(bank);
+        Bank bankNameEmpty = Bank.builder()
+                .name("")
+                .adminFee(6500)
+                .build();
+
+        Bank bankAdminFeeEmpty = Bank.builder()
+                .name("BCA")
+                .adminFee(0)
+                .build();
+
+        String requestBodyFullyEmpty = Util.mapToJson(bankFullyEmpty);
+
+        String requestBodyNameEmpty = Util.mapToJson(bankNameEmpty);
+
+        String requestBodyAdminFeeEmpty = Util.mapToJson(bankAdminFeeEmpty);
 
         mockMvc.perform(post(requestURI)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                .content(requestBodyFullyEmpty))
                 .andExpect(status().isBadRequest())
                 .andExpect(handler().methodName("addBank"))
                 .andDo(print());
-        verify(bankService, times(1)).create(any(BankRequest.class));
+
+        mockMvc.perform(post(requestURI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBodyNameEmpty))
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().methodName("addBank"))
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBodyAdminFeeEmpty))
+                .andExpect(status().isBadRequest())
+                .andExpect(handler().methodName("addBank"))
+                .andDo(print());
+
+        verify(bankService, times(3)).create(any(BankRequest.class));
     }
 
     @Test

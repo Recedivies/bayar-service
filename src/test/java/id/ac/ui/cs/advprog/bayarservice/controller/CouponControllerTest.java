@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.bayarservice.controller;
 
 import id.ac.ui.cs.advprog.bayarservice.Util;
+import id.ac.ui.cs.advprog.bayarservice.dto.bank.BankRequest;
 import id.ac.ui.cs.advprog.bayarservice.dto.coupon.CouponRequest;
 import id.ac.ui.cs.advprog.bayarservice.dto.coupon.UseCouponRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.coupon.CouponAlreadyExistException;
@@ -134,6 +135,8 @@ class CouponControllerTest {
 
        String requestBody = Util.mapToJson(coupon);
 
+       when(couponService.createCoupon(any(CouponRequest.class))).thenReturn(coupon);
+
         mockMvc.perform(post(END_POINT_PATH + "coupons/createCoupon")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
@@ -209,11 +212,51 @@ class CouponControllerTest {
     @Test
     void testCreateCouponShouldReturn400BadRequest() throws Exception {
         String requestURI = END_POINT_PATH + "coupons/createCoupon";
-        String requestBody = "";
+
+        Coupon emptyCouponName = Coupon.builder()
+                .name("")
+                .discount(50000L)
+                .build();
+
+        Coupon emptyCouponDiscount = Coupon.builder()
+                .name("SEPTEMBERCERIA")
+                .discount(null)
+                .build();
+
+        Coupon negativeCouponDiscount = Coupon.builder()
+                .name("SEPTEMBERCERIA")
+                .discount(-50000L)
+                .build();
+
+        String requestBodyEmptyCouponName = Util.mapToJson(emptyCouponName);
+
+        String requestBodyEmptyCouponDiscount = Util.mapToJson(emptyCouponDiscount);
+
+        String requestBodyNegativeCouponDiscount = Util.mapToJson(negativeCouponDiscount);
+
+        String requestBodyFullyEmpty = "";
 
         mockMvc.perform(post(requestURI)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(requestBodyEmptyCouponName))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyEmptyCouponDiscount))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyFullyEmpty))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyNegativeCouponDiscount))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
