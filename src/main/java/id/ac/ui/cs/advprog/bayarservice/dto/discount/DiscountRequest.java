@@ -18,5 +18,5 @@ public class DiscountRequest {
 
     @Min(0)
     @NotNull(message = "discount is mandatory")
-    private Long discount;
+    private float discount;
 }
