@@ -2,6 +2,7 @@ package id.ac.ui.cs.advprog.bayarservice.service;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.discount.DiscountRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.model.discount.DiscountType;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.repository.InvoiceRepository;
 import id.ac.ui.cs.advprog.bayarservice.service.discount.DiscountServiceImpl;
@@ -41,14 +42,14 @@ class DiscountServiceTest {
                 .build();
 
         nominalDiscountRequest = DiscountRequest.builder()
-                .discountType("Nominal")
+                .discountType(String.valueOf(DiscountType.NOMINAL))
                 .discount(50000L)
                 .build();
 
-            percentageDiscountRequest = DiscountRequest.builder()
-                .discountType("Percentage")
-                .discount(50L)
-                .build();
+        percentageDiscountRequest = DiscountRequest.builder()
+            .discountType(String.valueOf(DiscountType.PERCENTAGE))
+            .discount(50L)
+            .build();
 
         uuid = UUID.randomUUID();
     }
