@@ -3,6 +3,7 @@ package id.ac.ui.cs.advprog.bayarservice.controller;
 import id.ac.ui.cs.advprog.bayarservice.Util;
 import id.ac.ui.cs.advprog.bayarservice.dto.discount.DiscountRequest;
 import id.ac.ui.cs.advprog.bayarservice.service.discount.DiscountServiceImpl;
+import id.ac.ui.cs.advprog.bayarservice.model.discount.DiscountType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +36,12 @@ class DiscountControllerTest {
     @BeforeEach
     void setUp() {
         nominalDiscountRequest = DiscountRequest.builder()
-                .discountType("Nominal")
+                .discountType(String.valueOf(DiscountType.NOMINAL))
                 .discount(50000L)
                 .build();
 
         percentageDiscountRequest = DiscountRequest.builder()
-                .discountType("Percentage")
+                .discountType(String.valueOf(DiscountType.PERCENTAGE))
                 .discount(50L)
                 .build();
     }
