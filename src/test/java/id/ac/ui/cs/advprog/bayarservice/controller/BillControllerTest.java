@@ -199,13 +199,133 @@ class BillControllerTest {
 
     @Test
     void testAddBillShouldReturn400BadRequest() throws Exception {
-        Bill bill = Bill.builder().build();
         String requestURI = "/api/v1/bills";
-        String requestBody = Util.mapToJson(bill);
+
+        Bill billFullyEmpty = Bill.builder().build();
+
+        Bill billEmptyName = Bill.builder()
+                .name("")
+                .quantity(5)
+                .price(10000)
+                .subTotal(50000L)
+                .build();
+
+        Bill billEmptyQuantity = Bill.builder()
+                .name("Coffee")
+                .price(10000)
+                .subTotal(50000L)
+                .build();
+
+        Bill billEmptyPrice = Bill.builder()
+                .name("Coffee")
+                .quantity(5)
+                .subTotal(50000L)
+                .build();
+
+        Bill billEmptySubTotal = Bill.builder()
+                .name("Coffee")
+                .quantity(5)
+                .price(10000)
+                .build();
+
+        Bill billNegativeQuantity = Bill.builder()
+                .name("Coffee")
+                .quantity(-5)
+                .price(10000)
+                .subTotal(50000L)
+                .build();
+
+        Bill billNegativePrice = Bill.builder()
+                .name("Coffee")
+                .quantity(5)
+                .price(-10000)
+                .subTotal(50000L)
+                .build();
+
+        Bill billNegativeSubTotal = Bill.builder()
+                .name("Coffee")
+                .quantity(5)
+                .price(10000)
+                .subTotal(-50000L)
+                .build();
+
+        Bill billZeroQuantity = Bill.builder()
+                .name("Coffee")
+                .quantity(0)
+                .price(10000)
+                .subTotal(50000L)
+                .build();
+
+
+        String requestBodyFullyEmpty = Util.mapToJson(billFullyEmpty);
+
+        String requestBodyEmptyName = Util.mapToJson(billEmptyName);
+
+        String requestBodyEmptyQuantity = Util.mapToJson(billEmptyQuantity);
+
+        String requestBodyEmptyPrice = Util.mapToJson(billEmptyPrice);
+
+        String requestBodyEmptySubTotal = Util.mapToJson(billEmptySubTotal);
+
+        String requestBodyNegativeQuantity = Util.mapToJson(billNegativeQuantity);
+
+        String requestBodyNegativePrice = Util.mapToJson(billNegativePrice);
+
+        String requestBodyNegativeSubTotal = Util.mapToJson(billNegativeSubTotal);
+
+        String requestBodyZeroQuantity = Util.mapToJson(billZeroQuantity);
 
         mockMvc.perform(post(requestURI, 1)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(requestBodyFullyEmpty))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI, 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyEmptyName))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI, 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyEmptyQuantity))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI, 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyEmptyPrice))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI, 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyEmptySubTotal))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI, 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyNegativeQuantity))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI, 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyNegativePrice))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI, 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyNegativeSubTotal))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+        mockMvc.perform(post(requestURI, 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBodyZeroQuantity))
                 .andExpect(status().isBadRequest())
                 .andDo(print());
     }
