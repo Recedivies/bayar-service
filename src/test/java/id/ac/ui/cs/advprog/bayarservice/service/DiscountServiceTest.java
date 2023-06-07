@@ -40,6 +40,7 @@ class DiscountServiceTest {
     DiscountRequest aboveTotalPriceDiscountRequest;
     DiscountRequest aboveAHundredPercentDiscountRequest;
     DiscountRequest negativeDiscountRequest;
+    DiscountRequest aboveTotalAmountDiscountRequest;
     UUID uuid;
 
     @BeforeEach
@@ -77,6 +78,11 @@ class DiscountServiceTest {
         negativeDiscountRequest = DiscountRequest.builder()
             .discountType(String.valueOf(DiscountType.PERCENTAGE))
             .discount(-10L)
+            .build();
+
+        aboveTotalAmountDiscountRequest = DiscountRequest.builder()
+            .discountType(String.valueOf(DiscountType.PERCENTAGE))
+            .discount(96L)
             .build();
 
         uuid = UUID.randomUUID();
@@ -168,5 +174,13 @@ class DiscountServiceTest {
         when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
 
         Assertions.assertThrows(DiscountNegativeException.class, () -> discountService.giveDiscount(uuid, negativeDiscountRequest));
+    }
+
+    @Test
+    void whenDiscountAboveTotalPriceShouldSetDiscountToTotalPrice() {
+        when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
+
+        discountService.giveDiscount(uuid, aboveTotalAmountDiscountRequest);
+        verify(invoiceRepository, atLeastOnce()).save(any(Invoice.class));
     }
 }
