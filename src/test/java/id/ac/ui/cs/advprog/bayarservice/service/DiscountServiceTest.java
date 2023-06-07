@@ -1,6 +1,10 @@
 package id.ac.ui.cs.advprog.bayarservice.service;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.discount.DiscountRequest;
+import id.ac.ui.cs.advprog.bayarservice.exception.discount.DiscountAboveAHundredPercentException;
+import id.ac.ui.cs.advprog.bayarservice.exception.discount.DiscountAboveTotalPriceException;
+import id.ac.ui.cs.advprog.bayarservice.exception.discount.DiscountBelowAThousandException;
+import id.ac.ui.cs.advprog.bayarservice.exception.discount.DiscountNegativeException;
 import id.ac.ui.cs.advprog.bayarservice.exception.invoice.InvoiceDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.discount.DiscountType;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
@@ -32,6 +36,10 @@ class DiscountServiceTest {
     Invoice invoice;
     DiscountRequest nominalDiscountRequest;
     DiscountRequest percentageDiscountRequest;
+    DiscountRequest belowAThousandDiscountRequest;
+    DiscountRequest aboveTotalPriceDiscountRequest;
+    DiscountRequest aboveAHundredPercentDiscountRequest;
+    DiscountRequest negativeDiscountRequest;
     UUID uuid;
 
     @BeforeEach
@@ -49,6 +57,26 @@ class DiscountServiceTest {
         percentageDiscountRequest = DiscountRequest.builder()
             .discountType(String.valueOf(DiscountType.PERCENTAGE))
             .discount(50L)
+            .build();
+
+        belowAThousandDiscountRequest = DiscountRequest.builder()
+            .discountType(String.valueOf(DiscountType.NOMINAL))
+            .discount(999L)
+            .build();
+
+        aboveTotalPriceDiscountRequest = DiscountRequest.builder()
+            .discountType(String.valueOf(DiscountType.NOMINAL))
+            .discount(200000L)
+            .build();
+
+        aboveAHundredPercentDiscountRequest = DiscountRequest.builder()
+            .discountType(String.valueOf(DiscountType.PERCENTAGE))
+            .discount(105L)
+            .build();
+
+        negativeDiscountRequest = DiscountRequest.builder()
+            .discountType(String.valueOf(DiscountType.PERCENTAGE))
+            .discount(-10L)
             .build();
 
         uuid = UUID.randomUUID();
@@ -114,4 +142,31 @@ class DiscountServiceTest {
                 () -> discountService.giveDiscount(uuid, percentageDiscountRequest));
     }
 
+    @Test
+    void whenDiscountLessThan1000ShouldThrowException() {
+        when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
+
+        Assertions.assertThrows(DiscountBelowAThousandException.class, () -> discountService.giveDiscount(uuid, belowAThousandDiscountRequest));
+    }
+
+    @Test
+    void whenDiscountAboveTotalPriceShouldThrowException() {
+        when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
+
+        Assertions.assertThrows(DiscountAboveTotalPriceException.class, () -> discountService.giveDiscount(uuid, aboveTotalPriceDiscountRequest));
+    }
+
+    @Test
+    void whenDiscountAboveAHundredPercentShouldThrowException() {
+        when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
+
+        Assertions.assertThrows(DiscountAboveAHundredPercentException.class, () -> discountService.giveDiscount(uuid, aboveAHundredPercentDiscountRequest));
+    }
+
+    @Test
+    void whenDiscountNegativeShouldThrowException() {
+        when(invoiceRepository.findBySessionId(any(UUID.class))).thenReturn(Optional.of(invoice));
+
+        Assertions.assertThrows(DiscountNegativeException.class, () -> discountService.giveDiscount(uuid, negativeDiscountRequest));
+    }
 }
