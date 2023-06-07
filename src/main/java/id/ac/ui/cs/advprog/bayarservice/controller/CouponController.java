@@ -21,6 +21,8 @@ public class CouponController {
     private final CouponService couponService;
     private static final String SUCCESS = "SUCCESS";
 
+    private static final String FAILED = "FAILED";
+
     @PutMapping("/coupons/{couponId}")
     public ResponseEntity<Object> updateCoupon(@PathVariable Integer couponId, @RequestBody @Valid CouponRequest request) {
         Coupon coupon = couponService.update(couponId, request);
@@ -39,11 +41,17 @@ public class CouponController {
 
     @PostMapping("/coupons/createCoupon")
     public ResponseEntity<Object> createCoupon(@RequestBody @Valid CouponRequest request) {
+        if (request.getName().equals("")) {
+            return ResponseHandler.generateResponse(new Response(
+                    "Coupon Name Is Mandatory", HttpStatus.BAD_REQUEST, FAILED, null)
+            );
+        }
         Coupon coupon = couponService.createCoupon(request);
         return ResponseHandler.generateResponse(new Response(
                 "Success created coupon", HttpStatus.CREATED, SUCCESS, coupon)
         );
     }
+
 
     @DeleteMapping("/coupons/delete/{couponId}")
     public ResponseEntity<Object> deleteCoupon(@PathVariable Integer couponId) {
