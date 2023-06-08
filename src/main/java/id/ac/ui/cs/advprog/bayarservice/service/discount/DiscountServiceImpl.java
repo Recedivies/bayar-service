@@ -45,8 +45,13 @@ public class DiscountServiceImpl implements  DiscountService {
                 throw new DiscountNegativeException();
             }
             else {
-                long newDiscount = (long) ((invoice.getTotalAmount()/100) * request.getDiscount());
-                invoice.setDiscount(invoice.getDiscount() + newDiscount);
+                long newDiscount = (long) (((double) invoice.getTotalAmount()/100) * request.getDiscount());
+                if ((invoice.getDiscount() + newDiscount) > invoice.getTotalAmount()) {
+                    invoice.setDiscount(invoice.getTotalAmount());
+                }
+                else {
+                    invoice.setDiscount(invoice.getDiscount() + newDiscount);
+                }
             }
         }
 
