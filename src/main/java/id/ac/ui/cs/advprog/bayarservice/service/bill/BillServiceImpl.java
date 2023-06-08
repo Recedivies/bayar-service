@@ -8,6 +8,11 @@ import id.ac.ui.cs.advprog.bayarservice.repository.BillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import id.ac.ui.cs.advprog.bayarservice.service.invoice.InvoiceService;
+import id.ac.ui.cs.advprog.bayarservice.exception.bill.BillSubtotalUnderZeroException;
+import id.ac.ui.cs.advprog.bayarservice.exception.bill.BillQuantityUnderZeroException;
+import id.ac.ui.cs.advprog.bayarservice.exception.bill.BillPriceUnderZeroException;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -48,18 +53,39 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill update(Integer id, BillRequest request) {
-        Bill bill = this.billRepository.findById(id)
-                .orElseThrow(() -> new BillDoesNotExistException(id));
-        bill.setName(request.getName());
-        bill.setPrice(request.getPrice());
-        bill.setQuantity(request.getQuantity());
-        bill.setSubTotal(request.getSubTotal());
 
-        Invoice invoice = this.invoiceService.findById(bill.getInvoice().getId());
-        long toBeAdded = request.getSubTotal();
-        long toBeSubtracted = bill.getSubTotal();
-        invoice.setTotalAmount(invoice.getTotalAmount() - toBeSubtracted + toBeAdded);
-        return this.billRepository.save(bill);
+
+        Optional<Bill> optionalBill = this.billRepository.findById(id);
+        if (optionalBill.isPresent()) {
+            Bill bill = optionalBill.get();
+            try {
+                if (request.getPrice() < 0) {
+                    throw new BillPriceUnderZeroException(request.getPrice());
+                } else if (request.getQuantity() < 0) {
+                    throw new BillQuantityUnderZeroException(request.getQuantity());
+                } else if (request.getSubTotal() < 0) {
+                    throw new BillSubtotalUnderZeroException(request.getSubTotal());
+                }
+            } catch (BillPriceUnderZeroException e) {
+                throw new BillPriceUnderZeroException(request.getPrice());
+            } catch (BillQuantityUnderZeroException e) {
+                throw new BillQuantityUnderZeroException(request.getQuantity());
+            } catch (BillSubtotalUnderZeroException e) {
+                throw new BillSubtotalUnderZeroException(request.getSubTotal());
+            }
+            bill.setName(request.getName());
+            bill.setPrice(request.getPrice());
+            bill.setQuantity(request.getQuantity());
+            bill.setSubTotal(request.getSubTotal());
+
+            Invoice invoice = this.invoiceService.findById(bill.getInvoice().getId());
+            long toBeAdded = Math.max(0, request.getSubTotal() - bill.getSubTotal());
+            invoice.setTotalAmount(invoice.getTotalAmount() + toBeAdded);
+            this.billRepository.save(bill);
+            return bill;
+        } else {
+            throw new BillDoesNotExistException(id);
+        }
     }
 
     private boolean isBillDoesNotExist(Integer id) {

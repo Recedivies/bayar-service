@@ -7,6 +7,7 @@ import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
 import id.ac.ui.cs.advprog.bayarservice.repository.BankRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import id.ac.ui.cs.advprog.bayarservice.exception.bank.BankAdminBelowZeroException;
 
 import java.util.List;
 import java.util.Objects;
@@ -57,6 +58,10 @@ public class BankServiceImpl implements BankService {
 
         if (bankByName.isPresent() && !Objects.equals(bankByName.get().getId(), id)) {
             throw new BankAlreadyExistsException(request.getName());
+        }
+
+        if (request.getAdminFee() < 0) {
+            throw new BankAdminBelowZeroException(request.getAdminFee());
         }
 
         bank.setName(request.getName());

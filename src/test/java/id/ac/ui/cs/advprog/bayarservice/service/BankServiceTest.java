@@ -1,6 +1,7 @@
 package id.ac.ui.cs.advprog.bayarservice.service;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.bank.BankRequest;
+import id.ac.ui.cs.advprog.bayarservice.exception.bank.BankAdminBelowZeroException;
 import id.ac.ui.cs.advprog.bayarservice.exception.bank.BankAlreadyExistsException;
 import id.ac.ui.cs.advprog.bayarservice.exception.bank.BankDoesNotExistException;
 import id.ac.ui.cs.advprog.bayarservice.model.bank.Bank;
@@ -123,6 +124,7 @@ class BankServiceTest {
     void whenUpdateAndFoundByIdShouldUpdateBank() {
         BankRequest request = BankRequest.builder()
                 .name(bankName)
+                .adminFee(3000)
                 .build();
 
         bank = Bank.builder()
@@ -162,21 +164,38 @@ class BankServiceTest {
     void whenUpdateAndFoundByIdAndNameDoesNotExist() {
         BankRequest request = BankRequest.builder()
                 .name(bankName)
+                .adminFee(3000)
                 .build();
 
         bank = Bank.builder()
                 .id(1)
                 .name(request.getName())
+                .adminFee(request.getAdminFee())
                 .build();
 
         Bank bank2 = Bank.builder()
                 .id(2)
                 .name(request.getName())
+                .adminFee(request.getAdminFee())
                 .build();
         when(bankRepository.findById(any(Integer.class))).thenReturn(Optional.of(bank));
         when(bankRepository.findByName(any(String.class))).thenReturn(Optional.of(bank2));
         when(bankRepository.save(any(Bank.class))).thenReturn(bank);
         Bank result = bankService.update(2, request);
         Assertions.assertEquals(bank, result);
+    }
+
+    @Test
+    void whenUpdateAndAdminFeeIsNegativeShouldThrowException() {
+        BankRequest request = BankRequest.builder()
+                .name(bankName)
+                .adminFee(-1)
+                .build();
+
+        bank = Bank.builder()
+                .name(request.getName())
+                .build();
+        when(bankRepository.findById(any(Integer.class))).thenReturn(Optional.of(bank));
+        Assertions.assertThrows(BankAdminBelowZeroException.class, () -> bankService.update(1, request));
     }
 }

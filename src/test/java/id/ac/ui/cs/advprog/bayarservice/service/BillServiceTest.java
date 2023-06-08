@@ -2,6 +2,9 @@ package id.ac.ui.cs.advprog.bayarservice.service;
 
 import id.ac.ui.cs.advprog.bayarservice.dto.bill.BillRequest;
 import id.ac.ui.cs.advprog.bayarservice.exception.BillDoesNotExistException;
+import id.ac.ui.cs.advprog.bayarservice.exception.bill.BillPriceUnderZeroException;
+import id.ac.ui.cs.advprog.bayarservice.exception.bill.BillQuantityUnderZeroException;
+import id.ac.ui.cs.advprog.bayarservice.exception.bill.BillSubtotalUnderZeroException;
 import id.ac.ui.cs.advprog.bayarservice.model.bill.Bill;
 import id.ac.ui.cs.advprog.bayarservice.model.invoice.Invoice;
 import id.ac.ui.cs.advprog.bayarservice.repository.BillRepository;
@@ -136,6 +139,30 @@ class BillServiceTest {
     void whenUpdateBillAndNotFoundShouldThrowException() {
         when(billRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
         Assertions.assertThrows(BillDoesNotExistException.class,
+                () -> billService.update(0, updateRequest));
+    }
+
+    @Test
+    void whenUpdateBillAndPriceIsUnderZeroShouldThrowException() {
+        when(billRepository.findById(any(Integer.class))).thenReturn(Optional.of(bill));
+        updateRequest.setPrice(-1);
+        Assertions.assertThrows(BillPriceUnderZeroException.class,
+                () -> billService.update(0, updateRequest));
+    }
+
+    @Test
+    void whenUpdateBillAndQuantityIsUnderZeroShouldThrowException() {
+        when(billRepository.findById(any(Integer.class))).thenReturn(Optional.of(bill));
+        updateRequest.setQuantity(-1);
+        Assertions.assertThrows(BillQuantityUnderZeroException.class,
+                () -> billService.update(0, updateRequest));
+    }
+
+    @Test
+    void whenUpdateBillAndSubTotalIsNegativeShouldThrowException() {
+        when(billRepository.findById(any(Integer.class))).thenReturn(Optional.of(bill));
+        updateRequest.setSubTotal(-1L);
+        Assertions.assertThrows(BillSubtotalUnderZeroException.class,
                 () -> billService.update(0, updateRequest));
     }
 }
